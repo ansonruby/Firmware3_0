@@ -54,6 +54,15 @@ T_Maximo = 7        # timepo maximo para verificar un repetido para tipo  3 o ti
 T_Nuev_QR = 0       # timepo de inicioa de un nuevo qr
 T_Repe_QR = 0       # timepo de inicioa de un nuevo qr
 
+
+def Tx_datos():
+    #-------------------------------
+    #Para dispotitos CCCB
+    #-------------------------------
+    rele = Get_File(COM_TX_RELE)
+    if len(rele)>= 1:        
+        port.write(rele)
+        Clear_File(COM_TX_RELE)
 #---------------------------------------------------------------------------------------
 #                                   Funciones para la lectura de QR
 #---------------------------------------------------------------------------------------
@@ -204,7 +213,7 @@ def Datos_Serial():
 
     while True:
         try :
-            #Tx_datos()
+            Tx_datos()
             rcv = port.read(250)
             T_rcv = len(rcv)
             if T_rcv >= 1:
