@@ -8,3 +8,4 @@
 @reboot (sleep 40; python /home/pi/Firmware/app/Pro_Com_Couter.py) # Pro_Com_Counter
 @reboot (sleep 40; python /home/pi/Firmware/app/Pro_Sin_prioridad.py) # Pro_Sin_prioridad
 @reboot (sleep 45; python /home/pi/Firmware/app/Pro_QR.py) # Pro_QR
+@reboot (sleep 45; python /home/pi/Firmware/app/Pro_Teclado.py) # Pro_Teclado
