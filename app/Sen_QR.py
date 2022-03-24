@@ -60,7 +60,10 @@ T_Repe_QR = 0       # timepo de inicioa de un nuevo qr
 def No_Valido_QR(x):
     global SQ_Mensajes, QR, QR_antes, T_Nuev_QR, T_Repe_QR, T_Maximo
     QR = x
-    if QR != QR_antes:
+    if 'Igual' in QR :
+        if SQ_Mensajes: print 'Repetido'
+        Set_File(STATUS_REPEAT_QR, '2')    # Estado QR repetido
+    elif QR != QR_antes:
         QR_antes = QR
         #T_Nuev_QR = time.time()
         if SQ_Mensajes: print 'NO QR: ' + QR

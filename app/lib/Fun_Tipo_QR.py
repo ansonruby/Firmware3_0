@@ -144,15 +144,16 @@ def Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
             print 'Posicion linea: ' + str(Pos_linea)
 
         #--------   registro  para el counter
-        #Set_File(CONT_DATA,Co+Ti+'.'+Qr_Te+'.0.'+I_N_S+'\n')
-        #Set_File(CONT_FlAG,'1')
+        Enviar_Autorizado_Counter(Dato)
+
 
         #--------   Registro para el dispositivo
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1, Pos_linea, Dato)
         else:                   Add_Line_End(TAB_AUTO_TIPO_1, Dato)
 
         #--------   Registro generel para envio al servidor
-        # desavilitado
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
@@ -166,15 +167,14 @@ def Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
             print 'Posicion linea: ' + str(Pos_linea)
 
         #--------   registor  para el counter
-        #Set_File(CONT_DATA,Co+Ti+'.'+Qr_Te+'.0.'+I_N_S+'\n')
-        #Set_File(CONT_FlAG,'1')
+        Enviar_Autorizado_Counter(Dato)
 
         #--------   Registro en el dispositivo
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1, Pos_linea, Dato)
         else:                   Add_Line_End(TAB_AUTO_TIPO_1, Dato)
 
         #--------   Registro generel para envio al servidor
-        # desavilitado
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
@@ -299,12 +299,14 @@ def Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
             print 'Posicion linea: ' + str(Pos_linea)
 
         #--------   registro  para el counter
-        #Set_File(CONT_DATA,Co+Ti+'.'+Qr_Te+'.0.'+I_N_S+'\n')
-        #Set_File(CONT_FlAG,'1')
+        Enviar_Autorizado_Counter(Dato)
 
         #--------   Registro para el dispositivo
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2, Pos_linea, Dato)
         else:                   Add_Line_End(TAB_AUTO_TIPO_2, Dato)
+
+        #--------   Registro generel para envio al servidor
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
@@ -318,12 +320,14 @@ def Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
             print 'Posicion linea: ' + str(Pos_linea)
 
         #--------   registor  para el counter
-        #Set_File(CONT_DATA,Co+Ti+'.'+Qr_Te+'.0.'+I_N_S+'\n')
-        #Set_File(CONT_FlAG,'1')
+        Enviar_Autorizado_Counter(Dato)
 
         #--------   Registro en el dispositivo
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2, Pos_linea, Dato)
         else:                   Add_Line_End(TAB_AUTO_TIPO_2, Dato)
+
+        #--------   Registro generel para envio al servidor
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
@@ -451,12 +455,14 @@ def Guardar_Autorizacion_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Inte
             print 'Posicion linea: ' + str(Pos_linea)
 
         #--------   registro  para el counter
-        #Set_File(CONT_DATA,Co+Ti+'.'+Qr_Te+'.0.'+I_N_S+'\n')
-        #Set_File(CONT_FlAG,'1')
+        Enviar_Autorizado_Counter(Dato)
 
         #--------   Registro para el dispositivo
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2_1, Pos_linea, Dato)
         else:                   Add_Line_End(TAB_AUTO_TIPO_2_1, Dato)
+
+        #--------   Registro generel para envio al servidor
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
@@ -470,12 +476,14 @@ def Guardar_Autorizacion_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Inte
             print 'Posicion linea: ' + str(Pos_linea)
 
         #--------   registor  para el counter
-        #Set_File(CONT_DATA,Co+Ti+'.'+Qr_Te+'.0.'+I_N_S+'\n')
-        #Set_File(CONT_FlAG,'1')
+        Enviar_Autorizado_Counter(Dato)
 
         #--------   Registro en el dispositivo
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2_1, Pos_linea, Dato)
         else:                   Add_Line_End(TAB_AUTO_TIPO_2_1, Dato)
+
+        #--------   Registro generel para envio al servidor
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
@@ -563,40 +571,12 @@ def Guardar_Autorizacion_Tipo_3(usuario):
         Clear_File(TAB_USER_TIPO_3)
         Add_File(TAB_USER_TIPO_3, newUsuarios)
 
+        #--------   Registro generel para envio al servidor
+        #Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+        Enviar_Autorizado_Counter(usuario)
+
     else:
         print 'No cumple parametros'
-#---------------------------------------------------------
-def Enviar_Tipo3_Counter_Autorizado(Dato):
-    #print 'enviando dato'
-    heder = 'header.delTickets'
-    flag_Send = Get_File(CONT_SEND_FLAG_PATH)
-    if flag_Send == '':
-        #print 'basio'
-        Set_File(CONT_SEND_DATA_PATH, heder+'.1\n' + Dato+'\n')
-        Set_File(CONT_SEND_FLAG_PATH,'1')
-
-    else:
-        #print '1,2 o 3'
-        Data = Get_File(CONT_SEND_DATA_PATH)
-        #print Data
-        if Data == '':
-            #print 'esta basio'
-            Set_File(CONT_SEND_DATA_PATH, heder+'.1\n' + Dato+'\n')
-            #Set_File(CONT_SEND_FLAG_PATH,'1')
-        else:
-            Split_Data = Data.split("\n")
-            Header = Split_Data[0].split(".")
-            Contador = int(Header[2])+1
-            #print Contador
-            Datos = Split_Data[1:(int(Header[2])+1)]
-            Data=''
-            for linea in Datos:
-                #print linea
-                Data += linea + '\n'
-
-            Total = heder + '.' + str(Contador) + '\n' + Data + Dato + '\n'
-            #print Total
-            Set_File(CONT_SEND_DATA_PATH, heder + '.' + str(Contador) + '\n' + Data + Dato + '\n')
 #---------------------------------------------------------
 def Enviar_QR_Tipo3_Counter(QR, Tiempo_Actual):
     global FTQ_Mensajes
@@ -719,3 +699,34 @@ def Enviar_QR_Counter(QR, Tiempo_Actual):
     else:
         if FTQ_Mensajes:    print 'Error en la comunicacion : Flag No vacio'
         return 'Error',"-1"
+#---------------------------------------------------------
+def Enviar_Autorizado_Counter(Dato):
+    Prioridad = Get_File(CONF_AUTORIZACION_QR)
+    if Prioridad == '1' or Prioridad == '3':   #revizar tabla de Permisos
+        heder = 'header.delTickets'
+        flag_Send = Get_File(CONT_SEND_FLAG_PATH)
+        if flag_Send == '':
+            #print 'basio'
+            Set_File(CONT_SEND_DATA_PATH, heder+'.1\n' + Dato+'\n')
+            Set_File(CONT_SEND_FLAG_PATH,'1')
+        else:
+            #print '1,2 o 3'
+            Data = Get_File(CONT_SEND_DATA_PATH)
+            #print Data
+            if Data == '':
+                #print 'esta basio'
+                Set_File(CONT_SEND_DATA_PATH, heder+'.1\n' + Dato+'\n')
+                #Set_File(CONT_SEND_FLAG_PATH,'1')
+            else:
+                Split_Data = Data.split("\n")
+                Header = Split_Data[0].split(".")
+                Contador = int(Header[2])+1
+                #print Contador
+                Datos = Split_Data[1:(int(Header[2])+1)]
+                Data=''
+                for linea in Datos:
+                    #print linea
+                    Data += linea + '\n'
+                Total = heder + '.' + str(Contador) + '\n' + Data + Dato + '\n'
+                #print Total
+                Set_File(CONT_SEND_DATA_PATH, heder + '.' + str(Contador) + '\n' + Data + Dato + '\n')

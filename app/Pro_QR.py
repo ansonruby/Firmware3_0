@@ -44,7 +44,7 @@ from lib.Fun_Tipo_QR import *   #
 #-------------------------------------------------------
 # inicio de variable	--------------------------------------
 
-PP_Mensajes = 1     # 0: NO print  1: Print
+PP_Mensajes = 0     # 0: NO print  1: Print
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -467,9 +467,8 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
             if Ventana == 1:
 
                 Registro = QR + "." + Tiempo_Actual + ".1.0.1." + Incremento
-                Accion_Torniquete (Resp)
-                Guardar_Autorizacion_Tipo_3(Registro)       # Guardado interno
-                #Enviar_Tipo3_Counter_Autorizado(Registro)   # enviar a la comunicaiones desabilitado por el momento
+                Accion_Torniquete (Resp)                                # Aciones del disposivo
+                Guardar_Autorizacion_Tipo_3(Registro)                   # Guardado interno
                 return 1                                                # funcionamiento con normalidad
 
             else:

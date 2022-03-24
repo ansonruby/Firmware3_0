@@ -1,9 +1,10 @@
-@reboot (sleep 10; sudo python3.5 /home/pi/Firmware/app/lib/Actuador_Led_RGB.py) # Led
-@reboot (sleep 10; python /home/pi/Firmware/app/lib/Actuador_Power_IR.py) # Power_IR
-@reboot (sleep 10; python /home/pi/Firmware/app/lib/Actuador_Rele.py) # Rele
-@reboot (sleep 10; python /home/pi/Firmware/app/lib/Actuador_Buzzer.py) #Buzzer
-@reboot (sleep 10; python /home/pi/Firmware/app/lib/Sensor_QR.py) #Sensor_QR
+@reboot (sleep 10; python /home/pi/Firmware/app/Act_Power_IR.py) # Power_IR
+@reboot (sleep 10; python /home/pi/Firmware/app//Act_Rele.py) # Rele
+@reboot (sleep 10; sudo python3.5 /home/pi/Firmware/app/Act_Led_RGB.py) # Led
+@reboot (sleep 20; python /home/pi/Firmware/app/Act_Buzzer.py) #Buzzer
+@reboot (sleep 20; python /home/pi/Firmware/app/Sen_QR.py) #Sensor_QR
+@reboot (sleep 20; python3.5 /home/pi/Firmware/ComCounter/app.py) #ComCounter
 @reboot (sleep 35;  /home/pi/Firmware/sh/app_30_sleep.sh) # Teclado
-@reboot (sleep 20; python3.5  /home/pi/Firmware/ComCounter/app.py) # Comunicacion_Counter
-@reboot (sleep 10; python /home/pi/Firmware/app/lib/Comunicacion_Couter.py) # Proceso_Dispo
-@reboot (sleep 10; python /home/pi/Firmware/app/Procesar_QR.py) # Procesar_QR
+@reboot (sleep 40; python /home/pi/Firmware/app/Pro_Com_Couter.py) # Pro_Com_Counter
+@reboot (sleep 40; python /home/pi/Firmware/app/Pro_Sin_prioridad.py) # Pro_Sin_prioridad
+@reboot (sleep 45; python /home/pi/Firmware/app/Pro_QR.py) # Pro_QR

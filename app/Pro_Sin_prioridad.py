@@ -43,7 +43,7 @@ from lib.Fun_Tipo_QR import *   #
 
 #-------------------------------------------------------
 # inicio de variable	--------------------------------------
-PSP_Mensajes = 1     # 0: NO print  1: Print
+PSP_Mensajes = 0     # 0: NO print  1: Print
 #-------------------------------------------------------
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -134,16 +134,18 @@ def Actualizar_Usuarios_Desde_server():
     else: return -1
 #-------------------------------------------------------
 def Intentos_Actualizar_Usuarios(Cantidad):
-    global PSP_Mensajes
-
-    for Intentos in range(Cantidad):
-        if PSP_Mensajes:    print 'Intento '+str(Intentos)+', Actualizar usuarios'
-        if Actualizar_Usuarios_Desde_server() == 1:
-            print 'Actualisados'
-            break
-        else:
-            if PSP_Mensajes:
-                print 'NO actualizo'
+	global PSP_Mensajes
+	Prioridad = Get_File(CONF_AUTORIZACION_QR)
+	if Prioridad == '0' or Prioridad == '3':
+		Set_File(COM_LED, '8')
+		for Intentos in range(Cantidad):
+			if PSP_Mensajes:    print 'Intento '+str(Intentos)+', Actualizar usuarios'
+			if Actualizar_Usuarios_Desde_server() == 1:
+				if PSP_Mensajes:	print 'Actualisados'
+				break
+			else:
+				if PSP_Mensajes:	print 'NO actualizo'
+		Set_File(COM_LED, '0')
 #-------------------------------------------------------
 def Hora_Actualizacion_Usuarios(Hora_Actualizacion):
 
@@ -159,28 +161,95 @@ def Hora_Actualizacion_Usuarios(Hora_Actualizacion):
 #-------------------------------------------------------
 
 
-"""
+
+
+
+
+#------------------------------------------------------------------------------
+#                   Envio de usuarios autorizados por el dispositivos al servidor
+#------------------------------------------------------------------------------
+def Ping_Intento_Enviar_Usuarios_Autotizados():
+
+	global PSP_Mensajes
+
+	Prioridad = Get_File(CONF_AUTORIZACION_QR)
+
+    # ------- Prioridades de autorizacion ---------------------
+    # 0 :   Servidor      -> Dispositivos -> sin counter    F1_17
+    # 1 :   Counter       -> Dispositivos -> sin Servidor   offLine
+    # 2 :   Servidor      -> counter      -> Dispositivos   Nuevo
+    # 3 :   Counter       -> Servidor     -> Dispositivos   Nuevo
+    # ---------------------------------------------------------
+	if Prioridad == '0' or Prioridad == '3':
+		if PSP_Mensajes:	print 'avilitado comunicacion servidor'
+		Autorizaciones = Get_File(TAB_ENV_SERVER)
+		if len(Autorizaciones)>=1:
+			if PSP_Mensajes:
+				print 'hay usuarios para enviar'
+				print 'Ping antes de enviar'
+
+			Ruta            = Get_Rout_server()
+			ID_Dispositivo  = Get_ID_Dispositivo()
+			Tiempo_Actual = str(int(time.time()*1000.0))  # Tiempo()
+
+			if PSP_Mensajes: print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
+
+			if Status_Redes() == 1:
+				if 'OK' in Ping (Ruta.strip()):
+					#print Autorizaciones
+					Ev = Autorizaciones.replace('\n','","')
+					Ev = '{"in_out":["'+Ev+'"]}'
+					Ev = Ev.replace('",""]}','"]}')
+					Ev = Ev.replace(',""','')
+
+					if PSP_Mensajes:	print Ev
+					Respuesta= Enviar_Usuarios(Ruta.strip(),Tiempo_Actual,ID_Dispositivo,Ev)
+					if Respuesta.find("Error") == -1:
+						Clear_File(TAB_ENV_SERVER)
+						#print Respuesta
+						s = Respuesta
+						s= Filtro_Caracteres (s)
+						if len(s) != 0:
+							if PSP_Mensajes:	print 'guardar usuarios que estan dentro'
+							"""
+						    Escrivir_nuevo(1,s)     #al que pensar si los coloco en lectura como nuevo o no
+						    if PP_Mensajes:
+						        print s           #que hacer con los que se quedarono
+						    return 1                #se iso la entrega y se guardo los usuarios
+							"""
+						else:
+							if PSP_Mensajes:	print 'No hay usuarios adentro'
+					else:
+						if PSP_Mensajes:	print 'No se puedo enviar los usuarios'		#programs una nueva entrega
+				else:
+					if PSP_Mensajes:	print 'No contesta el servidor'
+			else:
+				if PSP_Mensajes:	print 'No Hay red LAN'
+		else:
+			if PSP_Mensajes:	print 'No hay nada para enviar'
+
+
+
 #---------------------------------------------------------
-#  Actualizar Usuarios al iniciar el proceso responsabilidad dispsotivos
+#  Actualizar Usuarios al iniciar el proceso
 #---------------------------------------------------------
 print 'Ciclo principal Actualizacion de Usuarios'
+
 if PSP_Mensajes: print 'Prioridad: '+ str(Get_File(CONF_AUTORIZACION_QR))
 
-if Get_File(CONF_AUTORIZACION_QR) == '0':
-    Set_File(COM_LED, '8')
-    Intentos_Actualizar_Usuarios(3)
-    Set_File(COM_LED, '0')
+Intentos_Actualizar_Usuarios(3)
+
 
 while 1:
-    #---------------------------------------------------------
-    #  Proceso 1: Tiempo de espera para disminuir proceso
-    #---------------------------------------------------------
-    time.sleep(1)
-    #---------------------------------------------------------
-    #Actualizar_Usuarios("12:10 AM") # 12:00 AM     03:59 PM # hora chile  10:00 PM 12:10 AM
-    #---------------------------------------------------------
-    if Get_File(CONF_AUTORIZACION_QR) == '0': Hora_Actualizacion_Usuarios("02:55 PM")
-"""
-
-Autorizaciones = Get_File(TAB_ENV_SERVER)
-print Autorizaciones
+	#---------------------------------------------------------
+	#  Proceso 1: Tiempo de espera para disminuir proceso
+	#---------------------------------------------------------
+	time.sleep(2) #minimo 1
+	#---------------------------------------------------------
+	# Proceso 2: Actualizar_Usuarios("12:10 AM") # 12:00 AM     03:59 PM # hora chile  10:00 PM 12:10 AM
+	#---------------------------------------------------------
+	if Get_File(CONF_AUTORIZACION_QR) == '0': Hora_Actualizacion_Usuarios("02:55 PM")
+	#---------------------------------------------------------
+	#  Proceso 3:Enviar usuarios a servidor si hay y si esta en la funcion
+	#---------------------------------------------------------
+	Ping_Intento_Enviar_Usuarios_Autotizados()
