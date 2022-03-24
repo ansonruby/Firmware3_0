@@ -44,7 +44,7 @@ def Comando_Rele(Direccion): #modificar a COM_TX_RELE revizar funcionamiento
     Clear_File(COM_TX_RELE)
     if Direccion == 0:      Set_File(COM_TX_RELE,"¿00000004000" + str(Tiempo_Rele) + "?") #Entrar
     elif Direccion == 1:    Set_File(COM_TX_RELE,"¿00000004010" + str(Tiempo_Rele) + "?") #Salir
-    elif Direccion == 2:    Set_File(COM_TX_RELE,"¿000000040300?")                              #Cerrar
+    elif Direccion == 2:    Set_File(COM_TX_RELE,"¿000000040300?")                        #Cerrar
 
 
 #-----------------------------------------------------------
@@ -119,29 +119,30 @@ def Ciclo_Rele():
 H_S_RELE   = threading.Thread(target=Salir)
 H_E_RELE   = threading.Thread(target=Entrar)
 
+Tipo_dispositivo =Get_File(INF_DISPO)
+Tipo_dis= Tipo_dispositivo.split("\n")
+print Tipo_dis[0]
+if      Tipo_dis[0] == 'ABDB' : Set_File(CONF_COMU_RELE,'R')
+elif    Tipo_dis[0] == 'CCCB' : Set_File(CONF_COMU_RELE,'T')
+else                          : Set_File(CONF_COMU_RELE,'R')
 
 Tipo_Comunicacion = Get_File(CONF_COMU_RELE)
-#if Tipo_Comunicacion == 'T':    Comando_Rele(1)       #Para dispositivos CCCB
+print Tipo_Comunicacion
+
 if Tipo_Comunicacion == 'R':     #Para dispositivos con relevos
     GPIO.setmode (GPIO.BOARD)
     for k in range(2):
         GPIO.setup(Rele[k], GPIO.OUT)
     Rele_close()
-
+elif Tipo_Comunicacion == 'T':  Comando_Rele(2)       #Para dispositivos con comunicacion rs485
 
 
 
 #-----------------------------------------------------------
-#               Pruebas de funcioanmiento
 #-----------------------------------------------------------
-#print 'que pasa'
-#Actividad_Rele(1)
-#Actividad_Rele(0)
-#Entrar()
-#Salir()
-#Direcion_Rele('Access granted-E')
-#Direcion_Rele('Access granted-S')
-
+#                   Ciclo principal
+#-----------------------------------------------------------
+#-----------------------------------------------------------
 Ciclo_Rele()
 
 
@@ -152,3 +153,17 @@ Ciclo_Rele()
 #                       RESUMEN y descripciones
 #-----------------------------------------------------------
 #-----------------------------------------------------------
+
+
+
+
+#-----------------------------------------------------------
+#               Pruebas de funcioanmiento
+#-----------------------------------------------------------
+
+#Actividad_Rele(1)
+#Actividad_Rele(0)
+#Entrar()
+#Salir()
+#Direcion_Rele('Access granted-E')
+#Direcion_Rele('Access granted-S')
