@@ -32,6 +32,7 @@ STATUS  = 'db/Status/'                                                  # Ruta  
 IMG     = 'img/'                                                        # Ruta      Imagenes del firmware
 DISP    = '/home/pi/.ID/'                                               # Ruta      Informacion Dispositivo
 DATA    = 'db/Data/'                                                    # Ruta      Base de datos
+DWEB    = '/var/www/html/'                                              # Ruta      WEB
 
 #---------------------------------------------------------------------------------------
 #                                  Datos del dispositivo
@@ -147,3 +148,10 @@ CONF_AUTORIZACION_TECLADO  = FIRM + CONF + 'Autorizaciones/Teclado/Tipos.txt'   
 CONF_DOMI_SERVER      = FIRM + CONF + 'Server/Dominio_Servidor.txt'           #
 CONF_IP_SERVER        = FIRM + CONF + 'Server/IP_Servidor.txt'                #
 CONF_M_CONEX_SERVER   = FIRM + CONF + 'Server/Mejor_Conexion.txt'             #
+
+#---------------------------------------------------------------------------------------
+#                                   Menu Web
+#---------------------------------------------------------------------------------------
+COM_WEB_ANTES         = FIRM + STATUS+ 'Web/Comandos_Web.txt'
+PRO_WEB               = FIRM + STATUS+ 'Web/Procesos_web.txt'
+COM_WEB               = DWEB +'Admin/include/Control_Web.txt'

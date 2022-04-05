@@ -85,6 +85,29 @@ def Get_MAC_addres():
     MAC             = MAC.replace(":","")
     return  MAC
 
+#----      verificar Ip o Dominio valido (wifi, ethernet)     ----
+#-----------------------------------------------------------
+def Validar_IP(IP):
+    try:
+        socket.inet_aton(IP)
+        if IP.count('.') == 3:
+            return True
+        else:
+            return False
+    except socket.error:
+        return False
+#-----------------------------------------------------------
+def Validar_Dominio(Dominio):
+    Resolver = "host -t A  " + Dominio + "   | grep address | awk {'print $4'}"    
+    address = commands.getoutput(Resolver)
+    try:
+        if Validar_IP(address):
+            return address
+        else:
+            return False
+    except socket.error:
+        return False
+
 #-----------------------------------------------------------
 #               Pruebas de funcioanmiento
 #-----------------------------------------------------------
