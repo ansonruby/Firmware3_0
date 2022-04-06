@@ -130,7 +130,7 @@ def  Procedimiento_Actualizar_Firmware():
 							Clear_File(RESP_PET_FIRMWARE)
 							Add_File(RESP_PET_FIRMWARE,ID_F+'\n')
 							Add_File(RESP_PET_FIRMWARE,Vercion_F+'\n')
-							Add_File(RESP_PET_FIRMWARE,Git_F+'\n')						
+							Add_File(RESP_PET_FIRMWARE,Git_F+'\n')
 							Set_File(STATUS_ACTUALIZADOR, '1') # Estado en 1 para el comiendso del Actualizador
 
 		else:
@@ -151,7 +151,7 @@ while 1:
 	#---------------------------------------------------------
 	#  Proceso 1: Actualizar en una hora determinada
 	#---------------------------------------------------------
-	Hora_Actualizacion_Firmware("05:44 PM") # 12:00 AM     03:59 PM # hora chile  10:00 PM 12:10 AM
+	Hora_Actualizacion_Firmware("12:34 PM") # 12:00 AM     03:59 PM # hora chile  10:00 PM 12:10 AM
 	#---------------------------------------------------------
 	#  Proceso 2: procedimiento inicial de Actualizacion
 	#---------------------------------------------------------
