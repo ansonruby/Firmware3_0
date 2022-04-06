@@ -33,6 +33,7 @@ IMG     = 'img/'                                                        # Ruta  
 DISP    = '/home/pi/.ID/'                                               # Ruta      Informacion Dispositivo
 DATA    = 'db/Data/'                                                    # Ruta      Base de datos
 DWEB    = '/var/www/html/'                                              # Ruta      WEB
+ACTUALI    = '/home/pi/Actualizador/'                                      # Ruta      Actualizador
 
 #---------------------------------------------------------------------------------------
 #                                  Datos del dispositivo
@@ -155,3 +156,12 @@ CONF_M_CONEX_SERVER   = FIRM + CONF + 'Server/Mejor_Conexion.txt'             #
 COM_WEB_ANTES         = FIRM + STATUS+ 'Web/Comandos_Web.txt'
 PRO_WEB               = FIRM + STATUS+ 'Web/Procesos_web.txt'
 COM_WEB               = DWEB +'Admin/include/Control_Web.txt'
+
+#---------------------------------------------------------------------------------------
+#                                   Actualizador
+#---------------------------------------------------------------------------------------
+
+RESP_PET_FIRMWARE       = ACTUALI + 'db/Respuesta_Peticion_Firmware.txt'
+STATUS_ACTUALIZADOR     = ACTUALI + 'db/Estado_Actualizador.txt'
+MEM_ACTUALIZADOR        = ACTUALI + 'db/Memoria_Actualizador.txt'
+COM_ACTUALIZADOR        = FIRM + COMMA + 'Actualizador/Forzar_Actualizador.txt'
