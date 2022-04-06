@@ -391,14 +391,12 @@ def Etapa_8():
 def Etapa_9():
 
     Log_Actualizador('9. verificar si estan en funcionamiento los procesos')
-
     #print 'No implementado'
     # posiblemente se coloque un proceso de verificacion de ejecucion de crontab -e
     # se requiere un proceso que verifique el funcionamiento
     # y una memoria que sepa enque estado va el proceso
     # arancando un proceos de nuevo
     # nohup  python /home/pi/Firmware/app/Chicharra.py
-
 
     res16 = Leer_Archivo(16) # procesos automaticos
 
@@ -411,9 +409,9 @@ def Etapa_9():
 
     for Trabajo in range(Cantidad_Trabajos):
         c = Trabajos[Trabajo]
-        #print c
+        print c
         print len (c)
-        if len(c) >=1 :       
+        if len(c) >=1 :
             c2 =c.split(")")
             c3 =c2[0].split("(")
 
@@ -465,14 +463,14 @@ def Etapa_10():
     print '10. colocar de fabrica el dispostivo'
     #por defecto deve venir pero porsi
     #print 'No implementado'
-
+    """
     Borrar(0)       #borrar tabla servidor
     Borrar(1)       #borrar tabla lector
     Borrar(2)       #borrar tabla Enviar
     print 'Base datos borrado'
 
-    Borrar(12)       #Borrar Numero de lecturas
-    Escrivir('0',12) #dejar en 0 las lecturas
+    #Borrar(12)       #Borrar Numero de lecturas
+    #Escrivir('0',12) #dejar en 0 las lecturas
 
     Borrar(14)       #Borrar Numero de Reinicios
     Escrivir('0',14) #dejar en 0 los reinicios
@@ -499,6 +497,7 @@ def Etapa_10():
     #Torniquete
     Borrar(13)      #Direcion Torniquete
     Escrivir_Estados('D',13)
+    """
 #-----------------------------------------------
 def Etapa_11():
 
