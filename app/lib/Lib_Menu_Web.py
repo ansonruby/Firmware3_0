@@ -101,11 +101,12 @@ def Resolver_Comando_Web():
 
         if Datos[0] == 'F':
             print 'Firmware'
-            """
+
             if Firmware(Datos, Comando) == 1:    # print('Restablecer')
-                Comando_Procesado(Comando)
-                Comando_Antes = Comando
-            """
+                print('Firm')
+                #Comando_Procesado(Comando)
+                #Comando_Antes = Comando
+
         if Datos[0] == 'R':
             print 'Restablecer'
 
@@ -248,6 +249,27 @@ def Restablecer(Datos, Comando):
         Set_File(PRO_WEB,'info, Comenzando Conexion')
         Test_Nuevo_Servidor(Comando,"Conectando")
         return 1
+
+    return 0
+
+#---------------------------------------------------------
+#----       Pagina Firmware
+#---------------------------------------------------------
+def Firmware(Datos, Comando):
+    if LMW_Mensajes:
+        print('-----------------------------')
+        print('firmware')
+
+
+    Set_File(COM_ACTUALIZADOR, '1')
+
+    Set_File(PRO_WEB,'info, Forzando Actualizacion')
+    time.sleep(3)
+
+    Set_File(PRO_WEB,'info, Ejecutando  Actualizacion')
+    time.sleep(3)
+    Clear_File(PRO_WEB)
+    return 1
 
     return 0
 #---------------------------------------------------------
