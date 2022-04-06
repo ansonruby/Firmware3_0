@@ -609,15 +609,6 @@ def Modificar_Archivo1(a, we, con_dns, Borrar):
 
 
 
-print 'listo'
-Permisos_Web()
-
-while 1:
-    time.sleep(0.5)
-    Resolver_Comando_Web()
-
-
-
 """
 R.Borrar_Historial
 R.Borrar_Base_de_datos
