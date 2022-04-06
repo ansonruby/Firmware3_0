@@ -730,7 +730,7 @@ def Evento_Forzar_Firmware():
 
         # Avilitar visualizacion
         if Contador_Inf_Forzar_Firmware == 1:
-            Set_File(COM_FIRMWARE, '1')   # cambiar estado para hacer la actualizacion de firmware
+            Set_File(COM_ACTUALIZADOR, '1')   # cambiar estado para hacer la actualizacion de firmware
             Estado_visual_Forzar_Firmware =1
             return 1
         # Desavilitar visualizacion
