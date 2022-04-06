@@ -412,40 +412,42 @@ def Etapa_9():
     for Trabajo in range(Cantidad_Trabajos):
         c = Trabajos[Trabajo]
         #print c
-        c2 =c.split(")")
-        c3 =c2[0].split("(")
+        print len (c)
+        if len(c) >=1 :       
+            c2 =c.split(")")
+            c3 =c2[0].split("(")
 
-        #if c3[0][0] == '#': print  'Desabilitado'
-        #else :              print  'Abilitado'
-        #if c3[0].find('reboot') != -1 :     print 'desde el inico'
-        #else :                              print 'Otra configuracion'
+            #if c3[0][0] == '#': print  'Desabilitado'
+            #else :              print  'Abilitado'
+            #if c3[0].find('reboot') != -1 :     print 'desde el inico'
+            #else :                              print 'Otra configuracion'
 
-        comando = "(" + c3[1] + ")"
-        #print 'comando: ' + comando
-        ID = c2[1].replace(" ","")
-        ID = ID.replace("#","")
-        #print 'ID: ' + ID
-        res = commands.getoutput('ps aux | grep '+ID)
-        #print 'Respuesta:'+ res
-        C_procesos=0
-        Procesos = res.split("\n")
-        for Proceso in range(len(Procesos)):
+            comando = "(" + c3[1] + ")"
+            #print 'comando: ' + comando
+            ID = c2[1].replace(" ","")
+            ID = ID.replace("#","")
+            #print 'ID: ' + ID
+            res = commands.getoutput('ps aux | grep '+ID)
+            #print 'Respuesta:'+ res
+            C_procesos=0
+            Procesos = res.split("\n")
+            for Proceso in range(len(Procesos)):
 
-            c = Procesos[Proceso]
-            #print c
-            if c.find('grep') == -1 : # filtro de procesos
+                c = Procesos[Proceso]
                 #print c
-                if c.find('python') != -1 :
-                    #print 'funcionando'
-                    C_procesos = C_procesos +1
-                    #print C_procesos
+                if c.find('grep') == -1 : # filtro de procesos
+                    #print c
+                    if c.find('python') != -1 :
+                        #print 'funcionando'
+                        C_procesos = C_procesos +1
+                        #print C_procesos
 
 
-        if C_procesos >= 1: # revisar cuanto generera par comparar correctamente
-            print 'funcionando: '+ ID + ' ' + str(C_procesos)
-            C_Trabajos = C_Trabajos + 1
-        else:
-            print 'NO fun: '+ ID + ' ' + str(C_procesos)
+            if C_procesos >= 1: # revisar cuanto generera par comparar correctamente
+                print 'funcionando: '+ ID + ' ' + str(C_procesos)
+                C_Trabajos = C_Trabajos + 1
+            else:
+                print 'NO fun: '+ ID + ' ' + str(C_procesos)
 
     print  C_Trabajos
     if C_Trabajos == Cantidad_Trabajos:
