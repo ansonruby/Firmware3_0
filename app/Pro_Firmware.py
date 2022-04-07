@@ -49,6 +49,46 @@ PF_Mensajes = 1     # 0: NO print  1: Print
 #                   funciones para el actualizador de firmware
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
+def Actualizar_Actualizador():
+
+    #Log_Actualizador('4. Cambiar nombre de firmware en ejecucion')
+    res = commands.getoutput('[ ! -f /home/pi/ActualizadorBK ] && echo "Existe" || echo "NO exiete"')
+    if res == 'Existe':
+        if PF_Mensajes:
+            print 'Eliminar BK'
+        res = commands.getoutput('sudo rm -R' + ' /home/pi/ActualizadorBK')
+        print res
+
+    res = commands.getoutput('mv /home/pi/Actualizador /home/pi/ActualizadorBK')
+    res = commands.getoutput('cp -r /home/pi/Firmware/Actualizador /home/pi/Actualizador')
+    res = commands.getoutput('chmod -R 755 /home/pi/Actualizador/sh/app_Actualizando.sh')
+    if PF_Mensajes:
+        print 'Respuesta:'+ res
+
+def Actualizar_Web():
+	res = commands.getoutput('[ -d /var/www/html/AdminBK ] && echo "Existe" || echo "NO exiete"')
+	if res == 'Existe':
+		if PF_Mensajes:
+			print 'Eliminar BK'
+		res = commands.getoutput('sudo rm -R' + ' /var/www/html/AdminBK')
+		print res
+
+	commands.getoutput('mv /var/www/html/Admin /var/www/html/AdminBK')
+	commands.getoutput('cp -r /home/pi/Firmware/Web/Admin /var/www/html/Admin')
+
+	commands.getoutput('sudo rm /var/www/html/index.php')
+	commands.getoutput('cp -r /home/pi/Firmware/Web/Install/index.php /var/www/html')
+
+	commands.getoutput('sudo chgrp www-data /var/www/html')
+	commands.getoutput('sudo usermod -a -G www-data pi')
+	commands.getoutput('sudo chmod -R 775 /var/www/html')
+	commands.getoutput('sudo chmod -R g+s /var/www/html')
+	commands.getoutput('sudo chown -R pi /var/www/html')
+
+	if PF_Mensajes:
+		print 'Respuesta:'+ res
+
+
 
 def Hora_Actual():
 	tiempo_segundos = time.time()
@@ -137,7 +177,55 @@ def  Procedimiento_Actualizar_Firmware():
 			if PF_Mensajes:
 				print 'No contesto el Servidor'
 
+	if Get_File(STATUS_ACTUALIZADOR) == '3':
+		if PF_Mensajes:
+			print 'Hay una terminacion de firmware enviar respuesta al servidor'
+		Ultimo = ""
+		res16 = Get_File(MEM_ACTUALIZADOR)	#Leer_Archivo(19) # Leer en donde va el proceso de actualizacion
+		#print res16
+		#print len (res16)
 
+		if len (res16) != 0:
+
+			Faces =res16.split("\n")
+			for Face in range(len(Faces)):
+				c = Faces[Face]
+				#print Face
+				#print c
+				c2 =c.split(" ")
+				if len(c2[0]) >= 2:
+					#print len(c2[0])
+					#print c2[0]
+					Ultimo = c2[0]
+		if PF_Mensajes:
+			print Ultimo
+		if Ultimo == '12.3':
+			if PF_Mensajes:
+				print 'Enviar respuesta al servidor Correcta'
+
+
+
+			#----antes de enviar respues actualizar el actualizador
+			Actualizar_Actualizador()
+			#----antes de enviar respues actualizar la web
+			Actualizar_Web()
+
+			T_A = str(int(time.time()*1000.0))
+			Ruta            = Get_Rout_server()
+			ID_Dispositivo  = Get_ID_Dispositivo()
+			if PF_Mensajes:
+				print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
+
+			Vercion = Get_File(INF_VERCION)
+			Vercion = Vercion.replace('\n','')
+			Vercion = Vercion.strip()
+
+			print Confimacion_Firmware(Ruta, T_A, ID_Dispositivo,Vercion, '')
+
+
+			#----- finalizacion de la actualizacion
+			Set_File(STATUS_ACTUALIZADOR,'0')
+			Clear_File(MEM_ACTUALIZADOR)
 
 
 
