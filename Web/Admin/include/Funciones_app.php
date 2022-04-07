@@ -55,21 +55,24 @@ function   Version_Firmware()
 					//$dato .= $linea;
 					while(!feof($fp)) {
 						$linea = fgets($fp);
-						//echo $linea . "<br />";
-						$porciones = explode("#", $linea);
-						$mm = 'ps aux | grep '.$porciones[1];//. "<br />";
-						//echo $mm. "<br />";
-						$temp = shell_exec($mm);
-						//echo $temp. "<br />";
-						$Apariciones = substr_count($temp, "pi");
-						//echo $porciones[1]."  ". $Apariciones. "<br />";
-						//echo $temp;
-						//echo $porciones[1] . "<br />";
-						$dato .= "<tr><td>".$porciones[1]."</td><td><img style='width:30px; height:30px;' ";
-						if  ($Apariciones >= 3) 		$dato .= "  src='./static/images/OK.png' /></td>";
-						else  											$dato .= "  src='./static/images/ERROR.png' /></td>";
-						//echo "<td><button type='button' class='btn btn-success'>Activar</button><button type='button' class='btn btn-danger'>Detener</button></td></tr>";
-						$dato .= "</tr>";
+						#echo strlen($linea);
+						if (strlen($linea) >=1){
+							//echo $linea . "<br />";
+							$porciones = explode("#", $linea);
+							$mm = 'ps aux | grep '.$porciones[1];//. "<br />";
+							//echo $mm. "<br />";
+							$temp = shell_exec($mm);
+							//echo $temp. "<br />";
+							$Apariciones = substr_count($temp, "pi");
+							//echo $porciones[1]."  ". $Apariciones. "<br />";
+							//echo $temp;
+							//echo $porciones[1] . "<br />";
+							$dato .= "<tr><td>".$porciones[1]."</td><td><img style='width:30px; height:30px;' ";
+							if  ($Apariciones >= 3) 		$dato .= "  src='./static/images/OK.png' /></td>";
+							else  											$dato .= "  src='./static/images/ERROR.png' /></td>";
+							//echo "<td><button type='button' class='btn btn-success'>Activar</button><button type='button' class='btn btn-danger'>Detener</button></td></tr>";
+							$dato .= "</tr>";
+						}
 					}
 
 			fclose($fp);
