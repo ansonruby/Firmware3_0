@@ -1,14 +1,18 @@
 <?php
 
   $message ="";
-
-  $fp = fopen("/home/pi/Firmware/db/Status/Procesos_web.txt", "r");
-  while (!feof($fp)){
-      $linea = fgets($fp);
-      //echo $linea;
-      $message = $linea;
+  $linea ="";
+  $nombre_fichero ="/home/pi/Firmware/db/Status/Web/Procesos_web.txt";
+  if (file_exists($nombre_fichero))
+  {
+    $fp = fopen($nombre_fichero, "r");
+    while (!feof($fp)){
+        $linea = fgets($fp);
+        //echo $linea;
+        $message = $linea;
+    }
+    fclose($fp);
   }
-  fclose($fp);
 
   $porciones = explode(",", $linea);
   //echo $porciones[0]; // porción1

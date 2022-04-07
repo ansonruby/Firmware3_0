@@ -160,7 +160,7 @@
 
 					<div class="form-group">
 						<label for="button_command">Dominio:</label>
-						<input type="text" class="form-control" id="Servidor" <?php $Servidor=$_POST['Servidor']; echo "value='$Servidor'"; ?> placeholder="Dominio.com" name="Servidor">
+						<input type="text" class="form-control" id="Servidor" <?php $Servidor=$_POST['Servidor']; echo "value='$Servidor'";?> placeholder="Dominio.com" name="Servidor">
 					</div>
 
 					<input id="button" class="btn btn-default" type="submit" value="Test" name="Test"/>
@@ -170,10 +170,12 @@
 
 			<!-- ---------------------------------------------------------------- -->
 			<?php
+
 				if(!empty($message))
 				{
 					echo '<div class="alert alert-danger" role="alert" style="margin-bottom:20px;">'.$message.'</div>';
 				}
+
 			?>
 			<?php 	echo '<div id="ProcesoUnidad"> </div>';	?>
 

@@ -72,9 +72,10 @@ function   IP_Ete($Red)
 //IP_Ete("eth0");
 function   Wifis()
 	{
-		$mm ="sudo iwlist wlan0 scan | grep ESSID";
+		$mm ="iwlist wlan0 scan | grep ESSID"; #"sudo iwlist wlan0 scan | grep ESSID";
 		$temp = shell_exec($mm);
 		//echo $temp;
+		//echo 'no se que pasa';
 		$temp=str_replace('\n','', $temp);
 		$opciones = explode('ESSID:', $temp);
 		//echo count($opciones);
