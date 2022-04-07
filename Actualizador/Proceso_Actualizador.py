@@ -17,7 +17,7 @@ Escrivir_Estados        = Ca.Escrivir_Estados
 Escrivir                = Ca.Escrivir_Archivo
 Leer_Estado             = Ca.Leer_Estado
 Leer_Archivo            = Ca.Leer_Archivo
-Generar		        = Ca.Generar_ID_Tarjeta
+Generar		            = Ca.Generar_ID_Tarjeta
 
 Crear_Trabajo           = Cu.Crear_Trabajo
 Eliminar_Trabajo        = Cu.Eliminar_Trabajo

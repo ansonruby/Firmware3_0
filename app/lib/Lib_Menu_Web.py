@@ -117,11 +117,12 @@ def Resolver_Comando_Web():
 
         if Datos[0] == 'T':
             print 'Torniquete'
-            """
-            if Torniquete(Datos) == 1:    # print('Comunicaciones')#
-                Comando_Procesado(Comando)
-                Comando_Antes = Comando
-            """
+
+            if Torniquete(Datos) == 1:
+                print('Comunicaciones')#
+                #Comando_Procesado(Comando)
+                #Comando_Antes = Comando
+
         if Datos[0] == 'C':
             print 'Comunicaciones'
 
@@ -628,6 +629,41 @@ def Modificar_Archivo1(a, we, con_dns, Borrar):
 
         f.close()
 
+#---------------------------------------------------------
+#----      pagina del Torniquete
+#---------------------------------------------------------
+
+
+def Torniquete(Datos):
+
+    if LMW_Mensajes:
+        print('-----------------------------')
+        print('Torniquete')
+        print('info, Configurando Torniquete')
+
+
+    Set_File(PRO_WEB,'info, Configurando Torniquete')
+    Con =len(Datos)
+    if Con == 5 :
+        if LMW_Mensajes:
+            print "Tiempo: "+Datos[2]+", Direccion: "+Datos[4]
+            #print Datos[4][0]
+        #Escrivir_Estados(str(Datos[4][0]),13)
+        #Escrivir_Estados(Datos[2],30)
+        Clear_File(CONF_TIEM_RELE)
+        Set_File(CONF_TIEM_RELE,str(Datos[2]))
+        Clear_File(CONF_DIREC_RELE)
+        Set_File(CONF_DIREC_RELE,str(Datos[4][0]))
+
+        time.sleep(3)
+        if LMW_Mensajes:
+            print('ok, Torniquete configurado')
+        Set_File(PRO_WEB,'ok, Torniquete configurado')
+        time.sleep(3)
+        Clear_File(PRO_WEB)
+        return 1
+
+    return 0
 
 
 
