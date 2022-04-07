@@ -77,7 +77,7 @@ def Decision_General():
     # Decision dependiendo del estado del dispositivo y configuracion de prioridades
     # -----------------------------------------------------------------------------
 
-    Prioridad = Get_File(CONF_AUTORIZACION_QR)
+    Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
 
     # ------- Prioridades de autorizacion ---------------------
     # 0 :   Servidor      -> Dispositivos -> sin counter    F1_17
@@ -85,6 +85,8 @@ def Decision_General():
     # 2 :   Servidor      -> counter      -> Dispositivos   Nuevo
     # 3 :   Counter       -> Servidor     -> Dispositivos   Nuevo
     # ---------------------------------------------------------
+    if PP_Mensajes: print Prioridad
+
     if  Prioridad == '0':
         if PP_Mensajes: print 'Prioridad Serv -> Dispo'
         Status_Peticion_Server = Decision_Server(R_Q,T_A)
