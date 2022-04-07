@@ -49,6 +49,41 @@ PF_Mensajes = 1     # 0: NO print  1: Print
 #                   funciones para el actualizador de firmware
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
+def RutaBK(Ruta):
+    Rura = CONF_TIEM_RELE
+    Rura = Rura.replace(FIRM,FIRMBK)
+    return Rura
+#------------------------
+def Mantener_configuraciones():
+    if PF_Mensajes:
+        print 'leer los archivos del BK '
+
+    #  -----------------------------------------
+    #  MANTENER LOS PARAMETRDS DEL RELE
+    #  -----------------------------------------
+
+    #--------   MATENER TIEMPO DEL RELE
+    Set_File(CONF_TIEM_RELE,Get_File(RutaBK(CONF_TIEM_RELE)))
+    #--------   MATENER TIEMPO DEL RELE
+    Set_File(CONF_DIREC_RELE,Get_File(RutaBK(CONF_DIREC_RELE)))
+    #--------   CONFIGURACIONES DEL RELE
+    Set_File(CONF_COMU_RELE,Get_File(RutaBK(CONF_COMU_RELE)))
+
+    #  -----------------------------------------
+    #  MANTENER LOS PARAMETROS DE LA FLECGA DEL TECLADO
+    #  -----------------------------------------
+    Set_File(CONF_FLECHA_TECLADO,Get_File(RutaBK(CONF_FLECHA_TECLADO)))
+
+    #  -----------------------------------------
+    #  MANTENER LOS PARAMETROS DE configuraciones de las autorizaiones del qr
+    #  -----------------------------------------
+    Set_File(CONF_AUTORIZACION_QR,Get_File(RutaBK(CONF_AUTORIZACION_QR)))
+
+
+
+
+
+
 def Actualizar_Actualizador():
 
     #Log_Actualizador('4. Cambiar nombre de firmware en ejecucion')
@@ -118,118 +153,122 @@ def Hora_Actualizacion_Firmware(Hora_Actualizacion):
 		Set_File(COM_ACTUALIZADOR, '1')   # Estado inicial del actualizador
 #--------------------------------------------------------
 def  Procedimiento_Actualizar_Firmware():
-	if Get_File(COM_ACTUALIZADOR) == '1':
-		Clear_File(COM_ACTUALIZADOR)
-		if PF_Mensajes:
-			print 'Proceso de revision del firmware'
+    if Get_File(COM_ACTUALIZADOR) == '1':
+        Clear_File(COM_ACTUALIZADOR)
+        if PF_Mensajes:
+            print 'Proceso de revision del firmware'
 
-		Vercion = Get_File(INF_VERCION)
-		Vercion = Vercion.replace('\n','')
-		Vercion = Vercion.strip()
-		#Vercion = "2022.03.11.0"  #----- comentariar    
+        Vercion = Get_File(INF_VERCION)
+        Vercion = Vercion.replace('\n','')
+        Vercion = Vercion.strip()
+        #Vercion = "2022.03.11.0"  #----- comentariar
 
-		T_A = str(int(time.time()*1000.0))
+        T_A = str(int(time.time()*1000.0))
 
-		Ruta            = Get_Rout_server()
-		ID_Dispositivo  = Get_ID_Dispositivo()
-		if PF_Mensajes:
-			print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
+        Ruta            = Get_Rout_server()
+        ID_Dispositivo  = Get_ID_Dispositivo()
+        if PF_Mensajes:
+            print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
 
-		Respuesta = Veri_Firmware(Ruta.strip(), T_A, ID_Dispositivo, Vercion)       #enviar peticion a servidor
+        Respuesta = Veri_Firmware(Ruta.strip(), T_A, ID_Dispositivo, Vercion)       #enviar peticion a servidor
 
-		if Respuesta.find("Error") == -1:
-			s = Filtro_Caracteres(Respuesta)
-			s=s.partition('\n')
-			s1 = s[0].replace('id:','')
-			ID_F = s1.replace('\r','')
-			s2 = s[2].partition('\r')
-			s3 = s2[0].replace('version:','')
-			Vercion_F =s3.replace('\r','')
-			Git_F = s2[2].replace('\r','')
-			Git_F = Git_F.replace('\n','')
-			Git_F = Git_F.replace('github:','')
-			#--------------------------------
-			if PF_Mensajes:
-				print 'ID: '+ ID_F + ' vercion: '+Vercion_F + ' git: '+Git_F
-
-
-			if ID_F=='OK':
-				if PF_Mensajes:
-					print 'Estoy actualizado'
-			else:
-				if ID_F !=  ID_Dispositivo :
-					if PF_Mensajes:
-						print 'NO es para mi'
-				else:
-					if Vercion.find(Vercion_F) != -1 :
-						if PF_Mensajes:
-							print 'ya esta actualizado'
-					else:
-						if PF_Mensajes:
-							print 'Devo actualizar la peticon es valida'#guarar la peticion
-							Clear_File(RESP_PET_FIRMWARE)
-							Add_File(RESP_PET_FIRMWARE,ID_F+'\n')
-							Add_File(RESP_PET_FIRMWARE,Vercion_F+'\n')
-							Add_File(RESP_PET_FIRMWARE,Git_F+'\n')
-							Set_File(STATUS_ACTUALIZADOR, '1') # Estado en 1 para el comiendso del Actualizador
-
-		else:
-			if PF_Mensajes:
-				print 'No contesto el Servidor'
-
-	if Get_File(STATUS_ACTUALIZADOR) == '3':
-		if PF_Mensajes:
-			print 'Hay una terminacion de firmware enviar respuesta al servidor'
-		Ultimo = ""
-		res16 = Get_File(MEM_ACTUALIZADOR)	#Leer_Archivo(19) # Leer en donde va el proceso de actualizacion
-		#print res16
-		#print len (res16)
-
-		if len (res16) != 0:
-
-			Faces =res16.split("\n")
-			for Face in range(len(Faces)):
-				c = Faces[Face]
-				#print Face
-				#print c
-				c2 =c.split(" ")
-				if len(c2[0]) >= 2:
-					#print len(c2[0])
-					#print c2[0]
-					Ultimo = c2[0]
-		if PF_Mensajes:
-			print Ultimo
-		if Ultimo == '12.3':
-			if PF_Mensajes:
-				print 'Enviar respuesta al servidor Correcta'
+        if Respuesta.find("Error") == -1:
+            s = Filtro_Caracteres(Respuesta)
+            s=s.partition('\n')
+            s1 = s[0].replace('id:','')
+            ID_F = s1.replace('\r','')
+            s2 = s[2].partition('\r')
+            s3 = s2[0].replace('version:','')
+            Vercion_F =s3.replace('\r','')
+            Git_F = s2[2].replace('\r','')
+            Git_F = Git_F.replace('\n','')
+            Git_F = Git_F.replace('github:','')
+            #--------------------------------
+            if PF_Mensajes:
+                print 'ID: '+ ID_F + ' vercion: '+Vercion_F + ' git: '+Git_F
 
 
+            if ID_F=='OK':
+                if PF_Mensajes:
+                    print 'Estoy actualizado'
+            else:
+                if ID_F !=  ID_Dispositivo :
+                    if PF_Mensajes:
+                        print 'NO es para mi'
+                else:
+                    if Vercion.find(Vercion_F) != -1 :
+                        if PF_Mensajes:
+                            print 'ya esta actualizado'
+                    else:
+                        if PF_Mensajes:
+                            print 'Devo actualizar la peticon es valida'#guarar la peticion
+                        Clear_File(RESP_PET_FIRMWARE)
+                        Add_File(RESP_PET_FIRMWARE,ID_F+'\n')
+                        Add_File(RESP_PET_FIRMWARE,Vercion_F+'\n')
+                        Add_File(RESP_PET_FIRMWARE,Git_F+'\n')
+                        Set_File(STATUS_ACTUALIZADOR, '1') # Estado en 1 para el comiendso del Actualizador
 
-			#----antes de enviar respues actualizar el actualizador
-			Actualizar_Actualizador()
-			#----antes de enviar respues actualizar la web
-			Actualizar_Web()
+        else:
+            if PF_Mensajes:
+                print 'No contesto el Servidor'
 
-			T_A = str(int(time.time()*1000.0))
-			Ruta            = Get_Rout_server()
-			ID_Dispositivo  = Get_ID_Dispositivo()
-			if PF_Mensajes:
-				print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
+    if Get_File(STATUS_ACTUALIZADOR) == '3':
+        if PF_Mensajes:
+            print 'Hay una terminacion de firmware enviar respuesta al servidor'
+        Ultimo = ""
+        res16 = Get_File(MEM_ACTUALIZADOR)	#Leer_Archivo(19) # Leer en donde va el proceso de actualizacion
+        #print res16
+        #print len (res16)
 
-			Vercion = Get_File(INF_VERCION)
-			Vercion = Vercion.replace('\n','')
-			Vercion = Vercion.strip()
+        if len (res16) != 0:
+            Faces =res16.split("\n")
+            for Face in range(len(Faces)):
+                c = Faces[Face]
+                #print Face
+                #print c
+                c2 =c.split(" ")
+                if len(c2[0]) >= 2:
+                    #print len(c2[0])
+                    #print c2[0]
+                    Ultimo = c2[0]
 
-			print Confimacion_Firmware(Ruta, T_A, ID_Dispositivo,Vercion, '')
+        if PF_Mensajes:
+            print Ultimo
+
+        if Ultimo == '12.3':
+            if PF_Mensajes:
+                print 'Enviar respuesta al servidor Correcta'
 
 
-			#----- finalizacion de la actualizacion
-			Set_File(STATUS_ACTUALIZADOR,'0')
-			Clear_File(MEM_ACTUALIZADOR)
+            #----antes de enviar respues actualizar el actualizador
+            Actualizar_Actualizador()
+            #----antes de enviar respues actualizar la web
+            Actualizar_Web()
+            #----Mantener configuraciones
+            Mantener_configuraciones()
+
+            T_A = str(int(time.time()*1000.0))
+            Ruta            = Get_Rout_server()
+            ID_Dispositivo  = Get_ID_Dispositivo()
+            if PF_Mensajes:
+                print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
+
+            Vercion = Get_File(INF_VERCION)
+            Vercion = Vercion.replace('\n','')
+            Vercion = Vercion.strip()
+
+            print Confimacion_Firmware(Ruta, T_A, ID_Dispositivo,Vercion, '')
+
+            #----- finalizacion de la actualizacion
+            Set_File(STATUS_ACTUALIZADOR,'0')
+            Clear_File(MEM_ACTUALIZADOR)
 
 
 
 
+Mantener_configuraciones()
+
+"""
 #---------------------------------------------------------
 while 1:
 	#---------------------------------------------------------
@@ -244,3 +283,4 @@ while 1:
 	#  Proceso 2: procedimiento inicial de Actualizacion
 	#---------------------------------------------------------
 	Procedimiento_Actualizar_Firmware()
+"""

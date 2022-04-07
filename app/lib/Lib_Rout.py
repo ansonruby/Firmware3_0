@@ -24,7 +24,7 @@ Libreria personal para el manejo de rutas del aplicativo.
 #---------------------------------------------------------------------------------------
 #                                   Rutas Generales
 #---------------------------------------------------------------------------------------
-
+FIRMBK    = '/home/pi/FirmwareBK/'
 FIRM    = '/home/pi/Firmware/'                                          # Ruta      Firmware
 COMMA   = 'db/Command/'                                                 # Ruta      Comandos
 CONF    = 'db/Config/'                                                  # Ruta      Configuraciones
@@ -109,7 +109,7 @@ Link_Alerta         = FIRM + IMG + "Teclado/alerta2.png"                # Imagen
 #-------------- comados y estados
 COM_TECLADO         = FIRM + COMMA + 'Teclado/Com_Teclado.txt'          # comandos teclados o lo digitado
 STATUS_TECLADO      = FIRM + STATUS + 'Teclado/Status_Teclado.txt'      # Estados teclados o si digito
-#-------------- Configuraciones
+#-------------- Configuraciones ----
 CONF_FLECHA_TECLADO = FIRM + CONF + 'Teclado/Flecha_Teclado.txt'
 
 #---------------------------------------------------------------------------------------
