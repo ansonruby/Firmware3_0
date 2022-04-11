@@ -67,6 +67,7 @@ def Get_Switch():
     Filtro[0] = int(GPIO.input(Pin_No_Touch))
 
     fil =float(Filtro[3]+ Filtro[2] + Filtro[1]+ Filtro[0])/4
+    #print fil
     if fil >= 0.25 :    return '1'  # print '1'
     else:               return '0'  # print '0'
 
@@ -94,8 +95,11 @@ def Proceso_Salir_Por_Boton():
     tiempo_actual = str(int(time.time()*1000.0))
     dato = '.' + tiempo_actual + '.4.1.1'
     #print dato
+    #---------------------------------------------
     # para registros de salidas
-    Add_File(TAB_AUTO_TIPO_3, dato + '\n')
+    # pendiente a donde enviar counter servidor
+    #Add_File(TAB_AUTO_TIPO_3, dato + '\n')
+    #---------------------------------------------
 
     Set_File(COM_LED , 'Access granted-S')
     Set_File(COM_RELE, 'Access granted-S')
@@ -105,7 +109,7 @@ def Proceso_Salir_Por_Boton():
 
     #esperar que lo suelten
     while 1:
-        time.sleep(0.05)
+        time.sleep(0.4)
         if Get_Switch() == '0':
             #print 'stop'
             break
@@ -134,13 +138,13 @@ GPIO.setup(Pin_No_Touch, GPIO.IN)
 
 Boton_Activo   = threading.Thread(target=Proceso_Salir_Por_Boton)
 
-"""
+
 print 'hola'
 while (True):
 
         time.sleep(0.05)
         Eventos_Boton_Salida()
-"""
+
 
 """
 # pendiente de reubicacion si es nesesario para llevar el aforo
