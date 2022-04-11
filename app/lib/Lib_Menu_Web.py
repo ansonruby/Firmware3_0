@@ -136,6 +136,7 @@ def Resolver_Comando_Web():
 #----       Permisos para lecto escritura web
 #---------------------------------------------------------
 def Permisos_Web():
+    commands.getoutput('sudo chown -R www-data:www-data /var/www')
     commands.getoutput('sudo chgrp www-data /var/www/html')
     commands.getoutput('sudo usermod -a -G www-data pi')
     commands.getoutput('sudo chmod -R 775 /var/www/html')

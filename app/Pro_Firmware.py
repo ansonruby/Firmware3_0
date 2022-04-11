@@ -266,9 +266,9 @@ def  Procedimiento_Actualizar_Firmware():
 
 
 
-Mantener_configuraciones()
+#Mantener_configuraciones()
 
-"""
+
 #---------------------------------------------------------
 while 1:
 	#---------------------------------------------------------
@@ -283,4 +283,3 @@ while 1:
 	#  Proceso 2: procedimiento inicial de Actualizacion
 	#---------------------------------------------------------
 	Procedimiento_Actualizar_Firmware()
-"""
