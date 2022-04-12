@@ -53,7 +53,8 @@ COM_FIRMWARE    = FIRM + COMMA + 'Firmware/Com_Firmware.txt'            # Config
 #---------------------------------------------------------------------------------------
 #                                  Base de datos separacion por tipos de qr
 #---------------------------------------------------------------------------------------
-
+TAB_USER_TIPO_1_1   = FIRM + DATA + 'Tipo_1_1/Tabla_Usuarios.txt'         # Usuarios del servidor o counter
+TAB_AUTO_TIPO_1_1   = FIRM + DATA + 'Tipo_1_1/Tabla_Autorizados.txt'      # Registro de usuarios autorizados entrada y salida
 TAB_USER_TIPO_1     = FIRM + DATA + 'Tipo_1/Tabla_Usuarios.txt'         # Usuarios del servidor o counter
 TAB_AUTO_TIPO_1     = FIRM + DATA + 'Tipo_1/Tabla_Autorizados.txt'      # Registro de usuarios autorizados entrada y salida
 TAB_PINES_TIPO_1    = FIRM + DATA + 'Tipo_1/Tabla_Pines.txt'            # pines de usuarios generados

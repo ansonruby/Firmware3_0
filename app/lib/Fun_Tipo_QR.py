@@ -48,6 +48,7 @@ def Validar_QR(QR):
         if (Inicio == '<' ) and (Fin == '>'):
             QR = QR.replace ("<","")
             QR = QR.replace (">","")
+            #print QR
             Validacion = Validar_QR_Fusepong(QR)
             if  Validacion != '':
                 if FTQ_Mensajes:    print Validacion +' : '+ QR
@@ -56,6 +57,95 @@ def Validar_QR(QR):
         else:                                       return '', QR   # No cumple parametros
     else:                                           return '', QR   # No cumple parametros
 
+
+
+
+
+#---------------------------------------------------------
+#---------------------------------------------------------
+#----                   TIPO 1_1 QR
+#---- Formato 1 :         azAZ09. azAZ09                  -> sha256.id  si exite el ID entra
+#---------------------------------------------------------
+#---------------------------------------------------------
+
+def Decision_Tipo_1_1(QR):
+
+    Veri_Impreso = Buscar_Impresos_Tipo_1_1(QR)
+    if Veri_Impreso == 0 :
+        Add_Line_End(TAB_USER_TIPO_1_1,QR+'\n')   #Para dispotivos asociados
+        QR = QR.replace('-',"")
+        #IDQ_Encrip, Resp = Estado_Usuario(IDQ_Encrip,1)
+        #print 'Verificar estado del usuario'
+        Vector = QR.split(".")
+        ID = Vector[1]
+        print ID
+        ID_1 = Buscar_ID_Tipo1(ID)
+        print ID_1
+        if ID_1 != -1:
+            return -1,'Access granted-E'
+    else:
+        return -1,'Denegado'
+
+    return -1,'Denegado'
+
+#---------------------------------------------------------
+def Buscar_Impresos_Tipo_1_1(QR): #mejorar por que podia pasa cualquiera
+    Contador=0
+    Usuarios = Get_File(TAB_USER_TIPO_1_1)
+    for linea in Usuarios.split('\n'):
+        #print linea.count('.')
+        if linea.count('.') >=1:
+            s=linea.rstrip('\n')
+            if 	s ==	QR: Contador +=1
+    return Contador
+#---------------------------------------------------------
+def Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+    global FTQ_Mensajes
+
+    Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
+    Tipo = '1' #    1: QR
+
+    if      Res == 'Access granted-E':
+
+        Rest = '0' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+
+        if FTQ_Mensajes:
+            print 'Registro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   registro  para el counter
+        #Enviar_Autorizado_Counter(Dato)
+
+
+        #--------   Registro para el dispositivo
+        #if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1_1, Pos_linea, Dato)
+        #else:                   Add_Line_End(TAB_AUTO_TIPO_1_1, Dato)
+
+        #--------   Registro generel para envio al servidor
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+
+    elif    Res == 'Access granted-S':
+
+        Rest = '1' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+        if FTQ_Mensajes:
+            print 'Reguistro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   registor  para el counter
+        #Enviar_Autorizado_Counter(Dato)
+
+        #--------   Registro en el dispositivo
+        #if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1_1, Pos_linea, Dato)
+        #else:                   Add_Line_End(TAB_AUTO_TIPO_1_1, Dato)
+
+        #--------   Registro generel para envio al servidor
+        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
 
 #---------------------------------------------------------
 #---------------------------------------------------------
@@ -178,6 +268,9 @@ def Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
+
+
+
 
 #---------------------------------------------------------
 #---------------------------------------------------------

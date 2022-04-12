@@ -30,6 +30,7 @@ import re
 #                                  Formatos de qr fusepong con expreciones regulares
 #---------------------------------------------------------------------------------------
 
+TIPO_1_1_QR_F   = '-[\w=+/]{80,150}\.[\w=+/]{1,80}'
 TIPO_1_QR_F     = '[\w=+/]{80,150}\.[\w=+/]{1,80}'
 TIPO_2_QR_F     = '[\w=+/]{1,150}\.[\w=+/]{1,150}\.\d{12,14}'
 TIPO_2_1_QR_F   = '[\w=+/]{1,150}\.[\w=+/]{1,150}\.\d{12,14}\.\d{12,14}'
@@ -55,6 +56,7 @@ def Validar_QR_Fusepong(Dato):
 
     if      re.match(TIPO_2_1_QR_F, Dato):      return 'T2_1'
     elif    re.match(TIPO_2_QR_F, Dato):        return 'T2'
+    elif    re.match(TIPO_1_1_QR_F, Dato):      return 'T1_1'
     elif    re.match(TIPO_1_QR_F, Dato):        return 'T1'
     elif    re.match(TIPO_3_QR_F, Dato):        return 'T3'
     elif    re.match(TIPO_3_Ne_QR_F, Dato):     return 'T3-'

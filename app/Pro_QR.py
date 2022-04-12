@@ -87,6 +87,7 @@ def Decision_General():
     # ---------------------------------------------------------
     if PP_Mensajes: print Prioridad
 
+
     if  Prioridad == '0':
         if PP_Mensajes: print 'Prioridad Serv -> Dispo'
         Status_Peticion_Server = Decision_Server(R_Q,T_A)
@@ -146,6 +147,7 @@ def Decision_General():
     else: Accion_Torniquete ('Error') # no hay prioridad
 
 
+
     """
     flag_Send = Get_File(CONT_SEND_FLAG_PATH)
     #print flag_Send
@@ -173,6 +175,34 @@ def Decision_Server(QR, Tiempo_Actual):
 
     Validacion, QR = Validar_QR(QR)              # Valido y que tipo es?
     if PP_Mensajes: print 'Tipo QR:' + Validacion
+    #------------------------------------------------------------------------------------------------------------
+    if  Validacion == 'T1_1': #falta enviar al counter
+        Veri_Impreso = Buscar_Impresos_Tipo_1_1(QR)
+        if Veri_Impreso == 0 :
+
+            Ruta            = Get_Rout_server()
+            ID_Dispositivo  = Get_ID_Dispositivo()
+            if PP_Mensajes: print 'Ruta:' + str(Ruta.strip()) + ', UUID:' + ID_Dispositivo
+            QR2 = QR.replace('-',"")
+            Respuesta = Enviar_QR(Ruta.strip(),Tiempo_Actual,ID_Dispositivo,QR2)
+
+            if PP_Mensajes: print 'Respuesta: ' + str(Respuesta)
+
+            if Respuesta.find("Error") == -1:                           # Entradas/Salidas Autorizadas
+                Accion_Torniquete (Respuesta)
+                Add_Line_End(TAB_USER_TIPO_1_1,QR+'\n')                 # guarda por un solo uso
+
+                return 1                                                # funcionamiento con normalidad
+            elif Respuesta.find("Error :Access denied") != -1:          # Autorizaciones denegadas
+                Accion_Torniquete (Respuesta)
+                return 1
+            else :                                                      # Sin internet Momentanio o fallo del servidor
+                if PP_Mensajes: print 'Sin internet o Fallo del servidor'
+                return -1
+        else:
+            Accion_Torniquete ('Denegado')
+            return 1                                                # funcionamiento con normalidad
+
     #------------------------------------------------------------------------------------------------------------
     if  Validacion == 'T1':
         Ruta            = Get_Rout_server()
@@ -302,6 +332,8 @@ def Decision_Counter(QR, Tiempo_Actual):
 
     Validacion, QR = Validar_QR(QR)              # Valido y que tipo es?
     if PP_Mensajes: print 'Tipo QR:' + Validacion
+
+
     #------------------------------------------------------------------------------------------------------------
     if  Validacion == 'T1': #falta enviar al counter
         Respuesta, conteo = Enviar_QR_Counter(QR, Tiempo_Actual)
@@ -407,6 +439,24 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
     Validacion, QR = Validar_QR(QR)              # Valido y que tipo es?
 
     if PP_Mensajes: print 'Tipo QR:' + Validacion
+
+    #------------------------------------------------------------------------------------------------------------
+    if  Validacion == 'T1_1': #falta enviar al counter
+        Pos_linea, Resp = Decision_Tipo_1_1(QR)
+        if PP_Mensajes:
+            print 'Resp:'+ Resp
+            print 'Pos_linea:'+ str(Pos_linea)
+
+        if Resp.find("Denegado") == -1:                           # Entradas/Salidas Autorizadas
+            Accion_Torniquete (Resp)
+            #Pos_linea = Buscar_Autorizados_ID_Tipo_1(QR)
+            #Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            return 1                                                # funcionamiento con normalidad
+        else :                                                      # denegado
+            Accion_Torniquete (Resp)
+            return 1                                                # funcionamiento con normalidad
+
     #------------------------------------------------------------------------------------------------------------
     if  Validacion == 'T1': #falta enviar al counter
 
