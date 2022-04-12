@@ -49,12 +49,29 @@ Pin_No_Touch        = 36                           # pin boton no touch
 
 Status_Hilo_activo  = 0                            # Estado del hilo
 Filtro              = [0, 0, 0, 0]                 # filtro
+ABNT_Mensajes       = 0                            # 1:print 0:not print
 
 
 
 #---------------------------------------------------------------------------------------
 #                                   Funciones para el boton no touch
 #---------------------------------------------------------------------------------------
+
+#--- leer el boton no touch
+
+def Enviar_Salida_Boton_Counter(DATO, Tiempo_Actual):
+    global ABNT_Mensajes
+    if Get_File(CONT_SEND_FLAG_PATH) == "":
+        Heder = 'header.buttonExit.1.'+Tiempo_Actual+'\n'
+        Dato_TX = DATO + '\n'
+        Total_TX = Heder + Dato_TX
+        # print Total_TX
+        Set_File(CONT_SEND_DATA_PATH, Total_TX)  # enviar el DATO
+        Set_File(CONT_SEND_FLAG_PATH, '1')
+        T_E = T_Antes = -1
+    else:
+        if ABNT_Mensajes:    print 'Error en la comunicacion : Flag No vacio'
+        return 'Error',"-1"
 
 #--- leer el boton no touch
 
@@ -94,6 +111,8 @@ def Proceso_Salir_Por_Boton():
 
     tiempo_actual = str(int(time.time()*1000.0))
     dato = '.' + tiempo_actual + '.4.1.1'
+    T_A = str(int(time.time()*1000.0))  # Tiempo()
+    Enviar_Salida_Boton_Counter(dato,T_A)
     #print dato
     #---------------------------------------------
     # para registros de salidas
@@ -139,10 +158,14 @@ GPIO.setup(Pin_No_Touch, GPIO.IN)
 Boton_Activo   = threading.Thread(target=Proceso_Salir_Por_Boton)
 
 
-print 'hola'
-while (True):
+if ABNT_Mensajes: print 'Boton no touch iniciado'
 
+while (True):
         time.sleep(0.05)
+        
+        button_status = Get_File(STATUS_BUTTON_NOTOUCH).strip()
+        if button_status =="0": continue
+
         Eventos_Boton_Salida()
 
 

@@ -90,6 +90,12 @@ COM_RELE        = FIRM + COMMA + 'Rele/Com_Rele.txt'                    # Comand
 COM_BUZZER      = FIRM + COMMA + 'Buzzer/Com_Buzzer.txt'                # Archivo de comandos
 
 #---------------------------------------------------------------------------------------
+#                                  Botton no touch
+#---------------------------------------------------------------------------------------
+
+STATUS_BUTTON_NOTOUCH      = FIRM + CONF + 'NoTouch/status.txt'         # Archivo habilitar o desactivar boton no touch
+
+#---------------------------------------------------------------------------------------
 #                                  Sensor QR
 #---------------------------------------------------------------------------------------
 

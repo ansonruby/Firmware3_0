@@ -10,6 +10,7 @@ AWAIT_TIME = 0.2
 AWAIT_PACKAGE_TIME = 0.02
 MAX_PACKAGE_BYTES_SIZE = 6000
 AWAIT_TIME_FROM_LAST_MESSAGE = 3
+SHOW_PRINT_MSG = True
 
 DB_DIR_NAME = os.path.dirname(os.path.realpath(__file__))+"/db"
 
@@ -24,6 +25,7 @@ class WsEvents(Websocket):
 
     SERVER_AWAIT_TIME = AWAIT_TIME
     DESCONECTION_MAX_TIME = AWAIT_TIME_FROM_LAST_MESSAGE
+    print_msg = SHOW_PRINT_MSG
 
     def onLoop(self):
         with open(SEND_FLAG_PATH, 'r', encoding='utf-8', errors='replace') as ff:
@@ -33,19 +35,19 @@ class WsEvents(Websocket):
                 if text == "1":
                     with open(SEND_DATA_PATH, 'r', encoding='utf-8', errors='replace') as df:
                         ticketsPack = ""
-                        ticketList = df.read().split('\n')
+                        dataList = df.read().split('\n')
                         df.close()
                         ReadLine = 0
-                        while(ReadLine < len(ticketList)):
-                            header = ticketList[ReadLine].split('.')
+                        while(ReadLine < len(dataList)):
+                            header = dataList[ReadLine].split('.')
                             ReadLine = ReadLine+1
-                            ticketData = ticketList[ReadLine:ReadLine +
+                            data = dataList[ReadLine:ReadLine +
                                                     int(header[2])]
                             ReadLine = ReadLine+int(header[2])+1
                             if(header[1] == "delTickets"):
-                                for i, ticket in enumerate(ticketData):
+                                for i, ticket in enumerate(data):
                                     ticketsPack += ticket+"\n"
-                                    if i == len(ticketData)-1:
+                                    if i == len(data)-1:
                                         self.broadcast(json.dumps(
                                             {'type': 'delTickets', 'status': '1'})+'////\n'+ticketsPack)
                                         ticketsPack = ""
@@ -56,7 +58,11 @@ class WsEvents(Websocket):
                                         time.sleep(AWAIT_PACKAGE_TIME)
                             elif(header[1] == "authTicket"):
                                 self.broadcast(json.dumps(
-                                    {'type': 'authTicket', 'status': '1'})+'////\n'+"\n".join(ticketData))
+                                    {'type': 'authTicket', 'status': '1'})+'////\n'+"\n".join(data))
+                                ticketsPack = ""
+                            elif(header[1] == "buttonExit"):
+                                self.broadcast(json.dumps(
+                                    {'type': 'buttonExit', 'status': '1'})+'////\n'+"\n".join(data))
                                 ticketsPack = ""
                             time.sleep(self.SERVER_AWAIT_TIME)
 
@@ -132,8 +138,12 @@ class WsEvents(Websocket):
         self.LAST_MESSAGE_TIME = int(time.time())
 
     def onConnect(self):
-        print("[SERVER]= New connection, total connection:" +
-              str(len(self.connections)))
+        if self.print_msg:
+            print("[SERVER]= New connection, total connection:" +
+                  str(len(self.connections)))
+        if len(self.connections) > 1:
+            self.close()
+            return
         if not os.path.exists(DB_DIR_NAME):
             os.makedirs(DB_DIR_NAME)
         if not os.path.exists(SEND_FLAG_PATH):
@@ -151,11 +161,11 @@ class WsEvents(Websocket):
             if ff.read() != "":
                 with open(SEND_DATA_PATH, 'r', encoding='utf-8', errors='replace') as df:
                     ticketsPack = ""
-                    text=df.read()
+                    text = df.read()
                     ticketList = text.split('\n')[1:]
                     file_text = text.replace(" ", "").replace("\n", "")
                     df.close()
-                    if( file_text != ""):
+                    if(file_text != ""):
                         with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
                             ffw.write("2")
                             ffw.close()
@@ -184,8 +194,10 @@ class WsEvents(Websocket):
         with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
             ffw.write("3")
             ffw.close()
-        print('[SERVER]= Closed conection from'+str(self.addr))
+        if self.print_msg:
+            print('[SERVER]= Closed conection from'+str(self.addr))
 
 
-server = WebsocketServer("0.0.0.0", SERVER_PORT, 2, ws_cls=WsEvents)
+server = WebsocketServer("0.0.0.0", SERVER_PORT, 2,
+                         SHOW_PRINT_MSG, ws_cls=WsEvents)
 server.run()

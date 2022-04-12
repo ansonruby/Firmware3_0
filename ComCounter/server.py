@@ -201,22 +201,25 @@ class Websocket(threading.Thread):
 
 class WebsocketServer:
 
-    def __init__(self, host, port, queues, ws_cls):
+    def __init__(self, host, port, queues,
+                 print_msg, ws_cls):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = host
         self.port = port
         self.queues = queues
         self.ws_cls = ws_cls
+        self.print_msg = print_msg
 
     def run(self):
         self.socket.bind((self.host, self.port))
         self.socket.listen(self.queues)
         loop = self
         while True:
-            print('[SERVER]= Waiting connection at ' +
-                  str(self.host)+":"+str(self.port))
+            if self.print_msg:
+                print('[SERVER]= Waiting connection at ' +
+                    str(self.host)+":"+str(self.port))
             conn, addr = self.socket.accept()
-
-            print('[SERVER]= Connected from '+str(addr))
+            if self.print_msg:
+                print('[SERVER]= Connected from '+str(addr))
             ws = self.ws_cls(conn, addr)
             ws.start()
