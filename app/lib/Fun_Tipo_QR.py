@@ -666,7 +666,7 @@ def Guardar_Autorizacion_Tipo_3(usuario):
 
         #--------   Registro generel para envio al servidor
         #Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
-        Enviar_Autorizado_Counter(usuario)
+        #Enviar_Autorizado_Counter(usuario)
 
     else:
         print 'No cumple parametros'

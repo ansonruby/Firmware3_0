@@ -521,6 +521,7 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
                 Registro = QR + "." + Tiempo_Actual + ".1.0.1." + Incremento
                 Accion_Torniquete (Resp)                                # Aciones del disposivo
                 Guardar_Autorizacion_Tipo_3(Registro)                   # Guardado interno
+                #Enviar_Autorizado_Counter(usuario)
                 return 1                                                # funcionamiento con normalidad
 
             else:
