@@ -42,7 +42,7 @@ from lib.Fun_Tipo_QR import *           #
 #-------------------------------------------------------
 # inicio de variable	--------------------------------
 
-PF_Mensajes = 1     # 0: NO print  1: Print
+PF_Mensajes = 0     # 0: NO print  1: Print
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ def  Procedimiento_Actualizar_Firmware():
         Vercion = Get_File(INF_VERCION)
         Vercion = Vercion.replace('\n','')
         Vercion = Vercion.strip()
-        Vercion = "2022.03.11.0"  #----- comentariar
+        #Vercion = "2022.03.11.0"  #----- comentariar
 
         T_A = str(int(time.time()*1000.0))
 
