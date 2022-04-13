@@ -25,7 +25,7 @@ if(isset($_POST["Cambiar"]) ){
  function  Dir_Torni()
  {
 
-	 $fh = fopen('/home/pi/Firmware/db/Config/Direccion_Torniquete.txt', 'r');
+	 $fh = fopen('/home/pi/Firmware/db/Config/Rele/Direccion_Rele.txt', 'r');
 		 $linea = fgetc($fh);
 	 fclose($fh);
 
@@ -35,7 +35,7 @@ if(isset($_POST["Cambiar"]) ){
  function  Tiem_Torni()
  {
 
-	$fh = fopen('/home/pi/Firmware/db/Config/Tiempo_Torniquete.txt', 'r');
+	$fh = fopen('/home/pi/Firmware/db/Config/Rele/Tiempo_Rele.txt', 'r');
 		$linea = fgetc($fh);
 	fclose($fh);
 
@@ -43,8 +43,8 @@ if(isset($_POST["Cambiar"]) ){
  }
 
 
-echo Dir_Torni();
-echo Tiem_Torni();
+//echo Dir_Torni();
+//echo Tiem_Torni();
 
 
 

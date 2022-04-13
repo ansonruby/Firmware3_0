@@ -2,6 +2,20 @@
 <?php
 	include_once('./include/config.php');
 
+	function  Dominio()
+	{
+
+		$fh = fopen('/home/pi/Firmware/db/Config/Server/Dominio_Servidor.txt', 'r');
+		$linea = fgets($fh);
+		
+		fclose($fh);
+
+		
+
+	 return $linea;
+	}
+	//echo Dominio();
+
 
 	function  ValidarIP($ip)
 	{
@@ -160,7 +174,24 @@
 
 					<div class="form-group">
 						<label for="button_command">Dominio:</label>
-						<input type="text" class="form-control" id="Servidor" <?php $Servidor=$_POST['Servidor']; echo "value='$Servidor'";?> placeholder="Dominio.com" name="Servidor">
+						<input type="text" class="form-control" id="Servidor" 
+
+						<?php
+
+							//$Servidor=$_POST['Servidor'];
+							//echo "value='$Servidor'";
+							if (isset($_POST['Servidor'])){
+								$Servidor=$_POST['Servidor'];
+								echo "value='$Servidor'";
+							}
+							else {
+								if ( Dominio() != '') {
+									$Servidor=Dominio();
+									echo "value='$Servidor'";
+								}
+							}
+							?>
+						placeholder="Dominio.com" name="Servidor">
 					</div>
 
 					<input id="button" class="btn btn-default" type="submit" value="Test" name="Test"/>
