@@ -278,7 +278,7 @@ while 1:
 	#---------------------------------------------------------
 	#  Proceso 1: Actualizar en una hora determinada
 	#---------------------------------------------------------
-	Hora_Actualizacion_Firmware("12:34 PM") # 12:00 AM     03:59 PM # hora chile  10:00 PM 12:10 AM
+	Hora_Actualizacion_Firmware("12:00 AM") # 12:00 AM     03:59 PM # hora chile  10:00 PM 12:10 AM 12:34 PM
 	#---------------------------------------------------------
 	#  Proceso 2: procedimiento inicial de Actualizacion
 	#---------------------------------------------------------
