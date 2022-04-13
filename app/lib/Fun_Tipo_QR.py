@@ -63,11 +63,14 @@ def Validar_QR(QR):
 #---- Formato 1 :         -azAZ09. azAZ09                  -> sha256.id  si exite el ID entra
 #---------------------------------------------------------
 #---------------------------------------------------------
+
+
+
 def Decision_Tipo_1_1(QR):
 
     Veri_Impreso = Buscar_Impresos_Tipo_1_1(QR)
     if Veri_Impreso == 0 :
-        Add_Line_End(TAB_USER_TIPO_1_1,QR+'\n')   #Para dispotivos asociados
+        #Add_Line_End(TAB_USER_TIPO_1_1,QR+'\n')   #Para dispotivos asociados
         QR = QR.replace('-',"")
         #IDQ_Encrip, Resp = Estado_Usuario(IDQ_Encrip,1)
         #print 'Verificar estado del usuario'
@@ -93,7 +96,7 @@ def Buscar_Impresos_Tipo_1_1(QR): #mejorar por que podia pasa cualquiera
             if 	s ==	QR: Contador +=1
     return Contador
 #---------------------------------------------------------
-def Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+def Guardar_Autorizacion_General_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
     global FTQ_Mensajes
 
     Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
@@ -106,22 +109,13 @@ def Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Inte
 
         if FTQ_Mensajes:
             print 'Registro: ' + Dato
-            print 'Posicion linea: ' + str(Pos_linea)
 
-        #--------   registro  para el counter
-        #Enviar_Autorizado_Counter(Dato)
-
-
-        #--------   Registro para el dispositivo
-        #if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1_1, Pos_linea, Dato)
-        #else:                   Add_Line_End(TAB_AUTO_TIPO_1_1, Dato)
-
-        #--------   Registro generel para envio al servidor
-        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
-
-
-        #--------   Registro generel de autorizaciones para aforo
+        Add_Line_End(TAB_USER_TIPO_1_1,QR+'\n')   #Para dispotivos asociados
+        #--------   Registro generel de autorizaciones para aforo?
         # desavilitado
+
+        return Dato
+
 
     elif    Res == 'Access granted-S':
 
@@ -129,17 +123,16 @@ def Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Inte
         Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
         if FTQ_Mensajes:
             print 'Reguistro: ' + Dato
-            print 'Posicion linea: ' + str(Pos_linea)
 
-        #--------   registor  para el counter
-        #Enviar_Autorizado_Counter(Dato)
+        Add_Line_End(TAB_USER_TIPO_1_1,QR+'\n')   #Para dispotivos asociados
+        #--------   Registro generel de autorizaciones para aforo?
+        # desavilitado
 
-        #--------   Registro en el dispositivo
-        #if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1_1, Pos_linea, Dato)
-        #else:                   Add_Line_End(TAB_AUTO_TIPO_1_1, Dato)
+        return Dato
+#---------------------------------------------------------
 
-        #--------   Registro generel para envio al servidor
-        Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
+
 
 #---------------------------------------------------------
 #---------------------------------------------------------
@@ -147,6 +140,8 @@ def Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Inte
 #---- Formato 1 :         azAZ09. azAZ09                  -> sha256.id  si exite el ID entra
 #---------------------------------------------------------
 #---------------------------------------------------------
+
+
 
 def Decision_Tipo_1(QR):
     Vector = QR.split(".")
@@ -212,7 +207,46 @@ def Buscar_Autorizados_ID_Tipo_1(QR):  # se puede mejorar la busqueda (busqueda 
         Pos_linea= 1 + Pos_linea
     return -1
 #---------------------------------------------------------
-def Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+def Guardar_Autorizacion_General_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+    global FTQ_Mensajes
+
+    Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
+    Tipo = '1' #    1: QR
+
+    if      Res == 'Access granted-E':
+
+        Rest = '0' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+
+        if FTQ_Mensajes:
+            print 'Registro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   Registro para el dispositivo
+        if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1, Pos_linea, Dato)
+        else:                   Add_Line_End(TAB_AUTO_TIPO_1, Dato)
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+        return Dato
+
+    elif    Res == 'Access granted-S':
+
+        Rest = '1' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+        if FTQ_Mensajes:
+            print 'Reguistro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   Registro en el dispositivo
+        if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_1, Pos_linea, Dato)
+        else:                   Add_Line_End(TAB_AUTO_TIPO_1, Dato)
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+        return Dato
+#---------------------------------------------------------
+def Guardar_Autorizacion_Dispo_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):# NO se utiliza
     global FTQ_Mensajes
 
     Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
@@ -262,7 +296,6 @@ def Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
-
 #---------------------------------------------------------
 #---------------------------------------------------------
 #----                   TIPO 2 QR
@@ -367,7 +400,59 @@ def Ventana_tiempo_Tipo_2(QR, Tiempo_Actual):
     if (Tiempo_inicio <= T_A) and (T_A <= Tiempo_fin):  return 1
     else:                                               return -1
 #---------------------------------------------------------
-def Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+def Guardar_Autorizacion_General_Tipo_2(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+    global FTQ_Mensajes
+
+    Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
+    Tipo = '1' #    1: QR
+
+    if      Res == 'Access granted-E':
+
+        Rest = '0' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+
+        if FTQ_Mensajes:
+            print 'Registro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   registro  para el counter
+        #Enviar_Autorizado_Counter(Dato)
+
+        #--------   Registro para el dispositivo
+        if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2, Pos_linea, Dato)
+        else:                   Add_Line_End(TAB_AUTO_TIPO_2, Dato)
+
+        #--------   Registro generel para envio al servidor
+        #Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+        return Dato
+
+    elif    Res == 'Access granted-S':
+
+        Rest = '1' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+        if FTQ_Mensajes:
+            print 'Reguistro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   registor  para el counter
+        #Enviar_Autorizado_Counter(Dato)
+
+        #--------   Registro en el dispositivo
+        if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2, Pos_linea, Dato)
+        else:                   Add_Line_End(TAB_AUTO_TIPO_2, Dato)
+
+        #--------   Registro generel para envio al servidor
+        #Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+        return Dato
+
+#---------------------------------------------------------
+def Guardar_Autorizacion_Dispo_Tipo_2(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
     global FTQ_Mensajes
 
     Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
@@ -523,7 +608,59 @@ def Ventana_tiempo_Tipo_2_1(QR, Tiempo_Actual):
     if (Tiempo_inicio <= T_A) and (T_A <= Tiempo_fin):  return 1
     else:                                               return -1
 #---------------------------------------------------------
-def Guardar_Autorizacion_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+def Guardar_Autorizacion_General_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
+    global FTQ_Mensajes
+
+    Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
+    Tipo = '1' #    1: QR
+
+    if      Res == 'Access granted-E':
+
+        Rest = '0' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+
+        if FTQ_Mensajes:
+            print 'Registro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   registro  para el counter
+        #Enviar_Autorizado_Counter(Dato)
+
+        #--------   Registro para el dispositivo
+        if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2_1, Pos_linea, Dato)
+        else:                   Add_Line_End(TAB_AUTO_TIPO_2_1, Dato)
+
+        #--------   Registro generel para envio al servidor
+        #Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+        return Dato
+
+    elif    Res == 'Access granted-S':
+
+        Rest = '1' #respuesta
+        Dato = QR + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
+        if FTQ_Mensajes:
+            print 'Reguistro: ' + Dato
+            print 'Posicion linea: ' + str(Pos_linea)
+
+        #--------   registor  para el counter
+        #Enviar_Autorizado_Counter(Dato)
+
+        #--------   Registro en el dispositivo
+        if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_2_1, Pos_linea, Dato)
+        else:                   Add_Line_End(TAB_AUTO_TIPO_2_1, Dato)
+
+        #--------   Registro generel para envio al servidor
+        #Add_Line_End(TAB_ENV_SERVER, Dato)#para envio al servidor revisar la habilitacion
+
+        #--------   Registro generel de autorizaciones para aforo
+        # desavilitado
+        return Dato
+        
+#---------------------------------------------------------
+def Guardar_Autorizacion_Dispo_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Internet):
     global FTQ_Mensajes
 
     Rest = '0' #    convercion de respuesta  # 0: entrada.1: salida .
@@ -727,6 +864,16 @@ def Enviar_QR_Tipo3_Counter(QR, Tiempo_Actual):
         print 'Tiempo vencido:'
         Accion_Torniquete('Denegado')
 #---------------------------------------------------------
+
+
+
+
+#---------------------------------------------------------
+#---------------------------------------------------------
+#-------            Envios genelares de informacion a counter o servidor
+#---------------------------------------------------------
+#---------------------------------------------------------
+
 def Enviar_QR_Counter(QR, Tiempo_Actual):
     global FTQ_Mensajes
     if Get_File(CONT_SEND_FLAG_PATH) == "":
@@ -813,3 +960,7 @@ def Enviar_Autorizado_Counter(Dato):
                 Total = heder + '.' + str(Contador) + '\n' + Data + Dato + '\n'
                 #print Total
                 Set_File(CONT_SEND_DATA_PATH, heder + '.' + str(Contador) + '\n' + Data + Dato + '\n')
+
+def Enviar_Autorizado_Server(Dato):
+    #--------   Registro generel para envio al servidor
+    Add_Line_End(TAB_ENV_SERVER, Dato)  # para envio al servidor

@@ -112,38 +112,6 @@ def Decision_General():
                 else: Accion_Torniquete ('Error') # Qr no valido
         else: Accion_Torniquete ('Error') # Qr no valido
     # ---------------------------------------------------------
-    elif  Prioridad == '2':
-        if PP_Mensajes: print 'Prioridad Serv -> counter -> Dispo'
-        Status_Peticion_Server = Decision_Server(R_Q,T_A)
-        if Status_Peticion_Server != -2:
-            if Status_Peticion_Server == -1: # Error en el servidor
-                Status_Peticion_Counter = Decision_Counter(R_Q,T_A)
-                if  Status_Peticion_Counter != -2:
-                    if  Status_Peticion_Counter == -1:# Error en el  counter
-                        Status_Peticion_Dispo = Decision_Dispositivo(R_Q,T_A)
-                        if Status_Peticion_Dispo == -2:
-                            if  Status_Peticion_Dispo == -1:# Error en el  Dispotivo
-                                Accion_Torniquete ('Error')
-                        else: Accion_Torniquete ('Error') # Qr no valido
-                else: Accion_Torniquete ('Error') # Qr no valido
-        else: Accion_Torniquete ('Error') # Qr no valido
-    # ---------------------------------------------------------
-    elif  Prioridad == '3':
-        if PP_Mensajes: print 'Prioridad counter -> Serv -> Dispo'
-        Status_Peticion_Server = Decision_Counter(R_Q,T_A)
-        if Status_Peticion_Server != -2:
-            if Status_Peticion_Server == -1: # Error en el servidor
-                Status_Peticion_Counter = Decision_Server(R_Q,T_A)
-                if  Status_Peticion_Counter != -2:
-                    if  Status_Peticion_Counter == -1:# Error en el  counter
-                        Status_Peticion_Dispo = Decision_Dispositivo(R_Q,T_A)
-                        if Status_Peticion_Dispo == -2:
-                            if  Status_Peticion_Dispo == -1:# Error en el  Dispotivo
-                                Accion_Torniquete ('Error')
-                        else: Accion_Torniquete ('Error') # Qr no valido
-                else: Accion_Torniquete ('Error') # Qr no valido
-        else: Accion_Torniquete ('Error') # Qr no valido
-    # ---------------------------------------------------------
     else: Accion_Torniquete ('Error') # no hay prioridad
 
 
@@ -202,7 +170,6 @@ def Decision_Server(QR, Tiempo_Actual):
         else:
             Accion_Torniquete ('Denegado')
             return 1                                                # funcionamiento con normalidad
-
     #------------------------------------------------------------------------------------------------------------
     if  Validacion == 'T1':
         Ruta            = Get_Rout_server()
@@ -217,7 +184,7 @@ def Decision_Server(QR, Tiempo_Actual):
             Accion_Torniquete (Respuesta)
             # verificar si hay registros del usuario
             Pos_linea = Buscar_Autorizados_ID_Tipo_1(QR)
-            Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+            Guardar_Autorizacion_General_Tipo_1(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
             return 1                                                # funcionamiento con normalidad
         elif Respuesta.find("Error :Access denied") != -1:          # Autorizaciones denegadas
             Accion_Torniquete (Respuesta)
@@ -239,7 +206,7 @@ def Decision_Server(QR, Tiempo_Actual):
             Accion_Torniquete (Respuesta)
             # verificar si hay registros del usuario
             Pos_linea = Buscar_Autorizados_ID_Tipo_2(QR)
-            Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+            Guardar_Autorizacion_General_Tipo_2(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
             return 1                                                # funcionamiento con normalidad
         elif Respuesta.find("Error :Access denied") != -1:          # Autorizaciones denegadas
             Accion_Torniquete (Respuesta)
@@ -262,7 +229,7 @@ def Decision_Server(QR, Tiempo_Actual):
             Accion_Torniquete (Respuesta)
             # verificar si hay registros del usuario
             Pos_linea = Buscar_Autorizados_ID_Tipo_2_1(QR)
-            Guardar_Autorizacion_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+            Guardar_Autorizacion_General_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
             return 1                                                # funcionamiento con normalidad
         elif Respuesta.find("Error :Access denied") != -1:          # Autorizaciones denegadas
             Accion_Torniquete (Respuesta)
@@ -342,7 +309,7 @@ def Decision_Counter(QR, Tiempo_Actual):
             Accion_Torniquete (Respuesta)
             # verificar si hay registros del usuario
             Pos_linea = Buscar_Autorizados_ID_Tipo_1(QR)
-            Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+            Guardar_Autorizacion_General_Tipo_1(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
             return 1
 
         elif Respuesta.find("Access denied") != -1:          # Autorizaciones denegadas
@@ -360,7 +327,7 @@ def Decision_Counter(QR, Tiempo_Actual):
             Accion_Torniquete (Respuesta)
             # verificar si hay registros del usuario
             Pos_linea = Buscar_Autorizados_ID_Tipo_2(QR)
-            Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+            Guardar_Autorizacion_General_Tipo_2(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
             return 1
 
         elif Respuesta.find("Access denied") != -1:          # Autorizaciones denegadas
@@ -378,7 +345,7 @@ def Decision_Counter(QR, Tiempo_Actual):
             Accion_Torniquete (Respuesta)
             # verificar si hay registros del usuario
             Pos_linea = Buscar_Autorizados_ID_Tipo_2(QR)
-            Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+            Guardar_Autorizacion_General_Tipo_2(QR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
             return 1
 
         elif Respuesta.find("Access denied") != -1:          # Autorizaciones denegadas
@@ -449,14 +416,19 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
 
         if Resp.find("Denegado") == -1:                           # Entradas/Salidas Autorizadas
             Accion_Torniquete (Resp)
-            #Pos_linea = Buscar_Autorizados_ID_Tipo_1(QR)
-            #Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
-            Guardar_Autorizacion_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+
+            Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
+            Dato = Guardar_Autorizacion_General_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            #----desicion a quie envio lo autorizado
+            if Prioridad == '0': # solo enviar lo autorizado al servidor
+                Enviar_Autorizado_Server(Dato) # envio general
+            if Prioridad == '1': # solo enviar lo autorizado al counter
+                Enviar_Autorizado_Counter(Dato) # envio general
+
             return 1                                                # funcionamiento con normalidad
         else :                                                      # denegado
             Accion_Torniquete (Resp)
             return 1                                                # funcionamiento con normalidad
-
     #------------------------------------------------------------------------------------------------------------
     if  Validacion == 'T1': #falta enviar al counter
 
@@ -468,7 +440,13 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
         if Resp.find("Denegado") == -1:                           # Entradas/Salidas Autorizadas
             Accion_Torniquete (Resp)
             Pos_linea = Buscar_Autorizados_ID_Tipo_1(QR)
-            Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            Dato = Guardar_Autorizacion_General_Tipo_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            #----desicion a quie envio lo autorizado
+            if Prioridad == '0': # solo enviar lo autorizado al servidor
+                Enviar_Autorizado_Server(Dato) # envio general
+            if Prioridad == '1': # solo enviar lo autorizado al counter
+                Enviar_Autorizado_Counter(Dato) # envio general
+
             return 1                                                # funcionamiento con normalidad
         else :                                                      # denegado
             Accion_Torniquete (Resp)
@@ -484,7 +462,13 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
         if Resp.find("Denegado") == -1:                           # Entradas/Salidas Autorizadas
             Accion_Torniquete (Resp)
             Pos_linea = Buscar_Autorizados_ID_Tipo_2(QR)
-            Guardar_Autorizacion_Tipo_2(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            Dato = Guardar_Autorizacion_General_Tipo_2(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            #----desicion a quie envio lo autorizado
+            if Prioridad == '0': # solo enviar lo autorizado al servidor
+                Enviar_Autorizado_Server(Dato) # envio general
+            if Prioridad == '1': # solo enviar lo autorizado al counter
+                Enviar_Autorizado_Counter(Dato) # envio general
+
             return 1                                                # funcionamiento con normalidad
         else :                                                      # denegado
             Accion_Torniquete (Resp)
@@ -501,6 +485,11 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
             Accion_Torniquete (Resp)
             Pos_linea = Buscar_Autorizados_ID_Tipo_2_1(QR)
             Guardar_Autorizacion_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+            #----desicion a quie envio lo autorizado
+            if Prioridad == '0': # solo enviar lo autorizado al servidor
+                Enviar_Autorizado_Server(Dato) # envio general
+            if Prioridad == '1': # solo enviar lo autorizado al counter
+                Enviar_Autorizado_Counter(Dato) # envio general
             return 1                                                # funcionamiento con normalidad
         else :                                                      # denegado
             Accion_Torniquete (Resp)
@@ -521,7 +510,11 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
                 Registro = QR + "." + Tiempo_Actual + ".1.0.1." + Incremento
                 Accion_Torniquete (Resp)                                # Aciones del disposivo
                 Guardar_Autorizacion_Tipo_3(Registro)                   # Guardado interno
-                #Enviar_Autorizado_Counter(usuario)
+                #----desicion a quie envio lo autorizado
+                if Prioridad == '0': # solo enviar lo autorizado al servidor
+                    Enviar_Autorizado_Server(Registro) # envio general
+                if Prioridad == '1': # solo enviar lo autorizado al counter
+                    Enviar_Autorizado_Counter(Registro) # envio general
                 return 1                                                # funcionamiento con normalidad
 
             else:
