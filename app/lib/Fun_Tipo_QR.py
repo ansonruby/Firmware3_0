@@ -57,17 +57,12 @@ def Validar_QR(QR):
         else:                                       return '', QR   # No cumple parametros
     else:                                           return '', QR   # No cumple parametros
 
-
-
-
-
 #---------------------------------------------------------
 #---------------------------------------------------------
-#----                   TIPO 1_1 QR
-#---- Formato 1 :         azAZ09. azAZ09                  -> sha256.id  si exite el ID entra
+#----                   TIPO 1_1 QR con identificador impreso
+#---- Formato 1 :         -azAZ09. azAZ09                  -> sha256.id  si exite el ID entra
 #---------------------------------------------------------
 #---------------------------------------------------------
-
 def Decision_Tipo_1_1(QR):
 
     Veri_Impreso = Buscar_Impresos_Tipo_1_1(QR)
@@ -87,7 +82,6 @@ def Decision_Tipo_1_1(QR):
         return -1,'Denegado'
 
     return -1,'Denegado'
-
 #---------------------------------------------------------
 def Buscar_Impresos_Tipo_1_1(QR): #mejorar por que podia pasa cualquiera
     Contador=0
@@ -268,9 +262,6 @@ def Guardar_Autorizacion_Tipo_1(QR, Tiempo_Actual, Pos_linea, Res, Status_Intern
 
         #--------   Registro generel de autorizaciones para aforo
         # desavilitado
-
-
-
 
 #---------------------------------------------------------
 #---------------------------------------------------------
@@ -735,7 +726,6 @@ def Enviar_QR_Tipo3_Counter(QR, Tiempo_Actual):
     else:
         print 'Tiempo vencido:'
         Accion_Torniquete('Denegado')
-
 #---------------------------------------------------------
 def Enviar_QR_Counter(QR, Tiempo_Actual):
     global FTQ_Mensajes

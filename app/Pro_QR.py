@@ -317,9 +317,9 @@ def Decision_Server(QR, Tiempo_Actual):
             return -1
 
     #NOTAS
-    # return -2 #NO tiene tipo de qr valido
-    # return -1 #sin internet o fallo del servidor
-    # return 1  # respuesta del servidor valida
+    # return -2     # NO tiene tipo de qr valido
+    # return -1     # sin internet o fallo del servidor
+    # return 1      # respuesta del servidor valida
     return -2
 
 #---------------------------------------------------------
