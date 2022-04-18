@@ -417,9 +417,10 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
         if Resp.find("Denegado") == -1:                           # Entradas/Salidas Autorizadas
             Accion_Torniquete (Resp)
 
-            Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
+
             Dato = Guardar_Autorizacion_General_Tipo_1_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
             #----desicion a quie envio lo autorizado
+            Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
             if Prioridad == '0': # solo enviar lo autorizado al servidor
                 Enviar_Autorizado_Server(Dato) # envio general
             if Prioridad == '1': # solo enviar lo autorizado al counter
@@ -442,6 +443,7 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
             Pos_linea = Buscar_Autorizados_ID_Tipo_1(QR)
             Dato = Guardar_Autorizacion_General_Tipo_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
             #----desicion a quie envio lo autorizado
+            Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
             if Prioridad == '0': # solo enviar lo autorizado al servidor
                 Enviar_Autorizado_Server(Dato) # envio general
             if Prioridad == '1': # solo enviar lo autorizado al counter
@@ -464,6 +466,7 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
             Pos_linea = Buscar_Autorizados_ID_Tipo_2(QR)
             Dato = Guardar_Autorizacion_General_Tipo_2(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
             #----desicion a quie envio lo autorizado
+            Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
             if Prioridad == '0': # solo enviar lo autorizado al servidor
                 Enviar_Autorizado_Server(Dato) # envio general
             if Prioridad == '1': # solo enviar lo autorizado al counter
@@ -486,6 +489,7 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
             Pos_linea = Buscar_Autorizados_ID_Tipo_2_1(QR)
             Guardar_Autorizacion_Tipo_2_1(QR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
             #----desicion a quie envio lo autorizado
+            Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
             if Prioridad == '0': # solo enviar lo autorizado al servidor
                 Enviar_Autorizado_Server(Dato) # envio general
             if Prioridad == '1': # solo enviar lo autorizado al counter
@@ -511,6 +515,7 @@ def Decision_Dispositivo(QR, Tiempo_Actual):
                 Accion_Torniquete (Resp)                                # Aciones del disposivo
                 Guardar_Autorizacion_Tipo_3(Registro)                   # Guardado interno
                 #----desicion a quie envio lo autorizado
+                Prioridad = Get_File(CONF_AUTORIZACION_QR).strip()
                 if Prioridad == '0': # solo enviar lo autorizado al servidor
                     Enviar_Autorizado_Server(Registro) # envio general
                 if Prioridad == '1': # solo enviar lo autorizado al counter
