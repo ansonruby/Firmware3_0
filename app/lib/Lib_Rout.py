@@ -64,6 +64,9 @@ TAB_USER_TIPO_2_1   = FIRM + DATA + 'Tipo_2_1/Tabla_Usuarios.txt'       # Usuari
 TAB_AUTO_TIPO_2_1   = FIRM + DATA + 'Tipo_2_1/Tabla_Autorizados.txt'    # Registro de usuarios autorizados entrada y salida
 TAB_USER_TIPO_3     = FIRM + DATA + 'Tipo_3/Tabla_Usuarios.txt'         # Usuarios del servidor o counter
 TAB_AUTO_TIPO_3     = FIRM + DATA + 'Tipo_3/Tabla_Autorizados.txt'      # Registro de usuarios autorizados entrada y salida
+TAB_USER_TIPO_6     = FIRM + DATA + 'Tipo_6/Tabla_Usuarios.txt'         # Usuarios del servidor o counter
+TAB_AUTO_TIPO_6     = FIRM + DATA + 'Tipo_6/Tabla_Autorizados.txt'      # Registro de usuarios autorizados entrada y salida
+
 
 TAB_ENV_SERVER      = FIRM + DATA + 'Autorizaciones/Tabla_Envio_server.txt'      # Registro de usuarios autorizados por el dispositivo
 
@@ -172,3 +175,10 @@ RESP_PET_FIRMWARE       = ACTUALI + 'db/Respuesta_Peticion_Firmware.txt'
 STATUS_ACTUALIZADOR     = ACTUALI + 'db/Estado_Actualizador.txt'
 MEM_ACTUALIZADOR        = ACTUALI + 'db/Memoria_Actualizador.txt'
 COM_ACTUALIZADOR        = FIRM + COMMA + 'Actualizador/Forzar_Actualizador.txt'
+
+#---------------------------------------------------------------------------------------
+#                                   NFC
+#---------------------------------------------------------------------------------------
+COM_NFC                 = FIRM + COMMA + 'Nfc/Com_Nfc.txt'                        # Datos leidos del Nfc
+STATUS_NFC              = FIRM + STATUS + 'Nfc/Status_Nfc.txt'                    # Estado del Nfc
+STATUS_REPEAT_NFC       = FIRM + STATUS + 'Nfc/Repeat_Nfc.txt'                    # Estado de repeticion del Nfc

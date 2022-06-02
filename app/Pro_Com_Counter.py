@@ -40,12 +40,21 @@ def add_Tipos_Usuarios_Nuevos(Usuario):
     # -----------------------------------------------------------------------------------------
     #           Formato 2.1 :       azAZ09. azAZ09. 09. 09          -> sha256.id.tiempo init.tiempo fin.
     # -----------------------------------------------------------------------------------------
+    elif puntos == 3:
+        # print '-----Formato 6: 6. azAZ09. azAZ09. 09'
+        s2 = Usuario.split(".")
+        ID = s2[1] + '.' + s2[2] + '.' + s2[3]
+        Add_File(TAB_USER_TIPO_6, ID+'\n')
+        #Clear_File(TAB_USER_TIPO_6)
+        #Clear_File(TAB_AUTO_TIPO_6)
+
     elif puntos == 4:
-        # print '-----Formato 2_1: azAZ09. azAZ09. 09. 09'
+        # print '-----Formato 3: azAZ09. azAZ09. 09. 09'
         s2 = Usuario.split(".")
         ID = s2[1] + '.' + s2[2] + '.' + s2[3] + '.' + s2[4]
         Add_File(TAB_USER_TIPO_3, ID+'\n')
         # add_New_Tikecket(Usuario)
+
 
     # -----------------------------------------------------------------------------------------
     #           Formato 3 :         09. azAZ09. azAZ09. azAZ09. 09  -> tipo.id.id.id.tiempo init.   tiken un solo uso
@@ -203,6 +212,8 @@ def Resolver_Comando_Counter():
                 Clear_File(TAB_AUTO_TIPO_2_1)
                 Clear_File(TAB_USER_TIPO_3)
                 Clear_File(TAB_AUTO_TIPO_3)
+                Clear_File(TAB_USER_TIPO_6)
+                Clear_File(TAB_AUTO_TIPO_6)
 
                 if len(Comando) >= 1:
                     Usuarios = Comando

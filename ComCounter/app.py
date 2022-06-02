@@ -1,4 +1,3 @@
-from cgitb import text
 from server import Websocket, WebsocketServer
 import os
 import json
@@ -42,7 +41,7 @@ class WsEvents(Websocket):
                             header = dataList[ReadLine].split('.')
                             ReadLine = ReadLine+1
                             data = dataList[ReadLine:ReadLine +
-                                                    int(header[2])]
+                                            int(header[2])]
                             ReadLine = ReadLine+int(header[2])+1
                             if(header[1] == "delTickets"):
                                 for i, ticket in enumerate(data):
@@ -74,6 +73,8 @@ class WsEvents(Websocket):
                     with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
                         ffw.write("3")
                         ffw.close()
+                    if self.print_msg:
+                        print("[SERVER]= Close conection for inactivity")
                     self.close()
 
     def onMessage(self, message):
@@ -85,8 +86,13 @@ class WsEvents(Websocket):
                     flagState = ff.read()
                     ff.close()
                     if flagState == "" or int(time.time())-self.LAST_MESSAGE_TIME >= self.DESCONECTION_MAX_TIME:
-                        accessList = requests.get(
-                            url="http://"+self.addr[0]+":8081/scannersPetition", params={"scannerAccessKey": req[1]})
+                        try:
+                            accessList = requests.get(
+                                url="http://"+self.addr[0]+":8081/scannersPetition", params={"scannerAccessKey": req[1]}, timeout=1)
+                            accessList.raise_for_status()
+                        except:
+                            self.close()
+                            break
                         with open(RECIVED_DATA_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
                             dfw.write(
                                 "header.currentTickets."+str(headerJson["size"][0])+"\n"+accessList.json()["tickets"])
@@ -142,8 +148,13 @@ class WsEvents(Websocket):
             print("[SERVER]= New connection, total connection:" +
                   str(len(self.connections)))
         if len(self.connections) > 1:
-            self.close()
-            return
+            with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
+                ffw.write("3")
+                ffw.close()
+            conns = list(iter(self.connections))
+            for i in range(len(conns)):
+                if i < len(conns)-1:
+                    conns[i].close()
         if not os.path.exists(DB_DIR_NAME):
             os.makedirs(DB_DIR_NAME)
         if not os.path.exists(SEND_FLAG_PATH):
@@ -194,6 +205,14 @@ class WsEvents(Websocket):
         with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
             ffw.write("3")
             ffw.close()
+        if self.print_msg:
+            print('[SERVER]= Closed conection from'+str(self.addr))
+
+    def onError(self):
+        with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
+            ffw.write("3")
+            ffw.close()
+        self.close()
         if self.print_msg:
             print('[SERVER]= Closed conection from'+str(self.addr))
 

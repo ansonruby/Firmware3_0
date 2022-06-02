@@ -44,7 +44,7 @@ from lib.Fun_Tipo_QR import *   #
 #-------------------------------------------------------
 # inicio de variable	--------------------------------------
 
-PP_Mensajes = 0     # 0: NO print  1: Print
+PP_Mensajes = 1     # 0: NO print  1: Print
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def Decision_General():
 
     # ------- Prioridades de autorizacion ---------------------
     # 0 :   Servidor      -> Dispositivos -> sin counter    F1_17
-    # 1 :   Counter       -> Dispositivos -> sin Servidor   offLine
+    # 1 :   Counter       -> Dispositivos -> sin Servidor   F2_0
     # 2 :   Servidor      -> counter      -> Dispositivos   Nuevo
     # 3 :   Counter       -> Servidor     -> Dispositivos   Nuevo
     # ---------------------------------------------------------
@@ -102,12 +102,12 @@ def Decision_General():
     # ---------------------------------------------------------
     elif  Prioridad == '1':
         if PP_Mensajes: print 'Prioridad Counter -> Dispo'
-        Status_Peticion_Server = Decision_Counter(R_Q,T_A)
-        if Status_Peticion_Server != -2:
-            if Status_Peticion_Server == -1: # Error en el counter
-                Status_Peticion_Counter = Decision_Dispositivo(R_Q,T_A)
-                if  Status_Peticion_Counter != -2:
-                    if  Status_Peticion_Counter == -1:# Error en el  Dispositivo
+        Status_Peticion_Counter = Decision_Counter(R_Q,T_A)
+        if Status_Peticion_Counter != -2:
+            if Status_Peticion_Counter == -1: # Error en el counter
+                Status_Peticion_Dispo = Decision_Dispositivo(R_Q,T_A)
+                if  Status_Peticion_Dispo != -2:
+                    if  Status_Peticion_Dispo == -1:# Error en el  Dispositivo
                         Accion_Torniquete ('Error') # Qr no valido
                 else: Accion_Torniquete ('Error') # Qr no valido
         else: Accion_Torniquete ('Error') # Qr no valido

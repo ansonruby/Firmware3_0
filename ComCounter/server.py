@@ -7,6 +7,7 @@ import base64
 import struct
 import weakref
 import time
+import gc
 
 
 class Websocket(threading.Thread):
@@ -59,6 +60,9 @@ class Websocket(threading.Thread):
     def onDisconnect(self):
         raise NotImplementedError
 
+    def onError(self):
+        raise NotImplementedError
+
     def open_handshake(self):
         data = self.conn.recv(262144)
 
@@ -91,35 +95,38 @@ class Websocket(threading.Thread):
             self.close_handshake(1002)
 
     def parse_frame(self):
-        data = self.conn.recv(2)
-
-        FIN = (data[0] >> 7) & 1
-        RSV1 = (data[0] >> 6) & 1
-        RSV2 = (data[0] >> 5) & 1
-        RSV3 = (data[0] >> 4) & 1
-
-        OPCODE = data[0] & 0xf
-        MASK = (data[1] >> 7) & 1
-
-        if not MASK:
-            self.close_handshake(1002)
-
-        PAYLOAD_LENGTH = data[1] & 0x7f
-
-        if PAYLOAD_LENGTH == 126:
+        try:
             data = self.conn.recv(2)
-            PAYLOAD_LENGTH = struct.unpack('H', data)[0]
-        elif PAYLOAD_LENGTH == 127:
-            data = self.conn.recv(8)
-            PAYLOAD_LENGTH = struct.unpack('Q', data)[0]
 
-        MASKING_KEY = self.conn.recv(4)
+            FIN = (data[0] >> 7) & 1
+            RSV1 = (data[0] >> 6) & 1
+            RSV2 = (data[0] >> 5) & 1
+            RSV3 = (data[0] >> 4) & 1
 
-        PAYLOAD_DATA = self.conn.recv(PAYLOAD_LENGTH)
+            OPCODE = data[0] & 0xf
+            MASK = (data[1] >> 7) & 1
 
-        PAYLOAD_DATA = self.unmask(PAYLOAD_DATA, MASKING_KEY)
+            if not MASK:
+                self.close_handshake(1002)
 
-        return OPCODE, PAYLOAD_DATA
+            PAYLOAD_LENGTH = data[1] & 0x7f
+
+            if PAYLOAD_LENGTH == 126:
+                data = self.conn.recv(2)
+                PAYLOAD_LENGTH = struct.unpack('H', data)[0]
+            elif PAYLOAD_LENGTH == 127:
+                data = self.conn.recv(8)
+                PAYLOAD_LENGTH = struct.unpack('Q', data)[0]
+
+            MASKING_KEY = self.conn.recv(4)
+
+            PAYLOAD_DATA = self.conn.recv(PAYLOAD_LENGTH)
+
+            PAYLOAD_DATA = self.unmask(PAYLOAD_DATA, MASKING_KEY)
+
+            return OPCODE, PAYLOAD_DATA
+        except:
+            self.onError()
 
     def unmask(self, data, key):
         unmasked = bytearray(data)
@@ -152,7 +159,7 @@ class Websocket(threading.Thread):
         self.conn.sendall(frame)
 
         if self.state == self.OPEN:
-            self.state == self.CLOSING
+            self.state = self.CLOSING
 
             while True:
                 OPCODE, PAYLOAD_DATA = self.parse_frame()
@@ -175,7 +182,8 @@ class Websocket(threading.Thread):
         frame = self.build_frame(payload_data, opcode)
 
         for t in self.connections:
-            t.conn.sendall(frame)
+            if t.conn and self.state != self.CLOSED:
+                t.conn.sendall(frame)
 
     def close(self):
         self.conn.shutdown(socket.SHUT_RDWR)
@@ -184,6 +192,7 @@ class Websocket(threading.Thread):
 
     def run(self):
         while True:
+            gc.collect()
             if self.state == self.CONNECTING:
                 self.open_handshake()
                 self.onConnect()
@@ -195,6 +204,9 @@ class Websocket(threading.Thread):
                 else:
                     self.onLoop()
             elif self.state == self.CLOSED:
+                conn = self.conn
+                del conn
+                gc.collect()
                 self.onDisconnect()
                 break
 
@@ -217,7 +229,7 @@ class WebsocketServer:
         while True:
             if self.print_msg:
                 print('[SERVER]= Waiting connection at ' +
-                    str(self.host)+":"+str(self.port))
+                      str(self.host)+":"+str(self.port))
             conn, addr = self.socket.accept()
             if self.print_msg:
                 print('[SERVER]= Connected from '+str(addr))

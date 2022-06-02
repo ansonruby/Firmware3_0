@@ -38,6 +38,7 @@ from lib.Lib_Networks import *          #
 from lib.Fun_Dispositivo import *       #
 from lib.Fun_Server import *            #
 from lib.Fun_Tipo_QR import *           #
+from lib.Lib_Encryp import *           #
 
 #-------------------------------------------------------
 # inicio de variable	--------------------------------
@@ -91,7 +92,18 @@ def Decision_General():
     # ---------------------------------------------------------
     elif  Prioridad == '1':
         if PT_Mensajes: print 'Prioridad Counter -> Dispo'
-        Accion_Torniquete ('Error') # no hay prioridad
+        Status_Peticion_Counter = Decision_Counter(R_Teclas,T_A)
+        print(Status_Peticion_Counter)
+        if Status_Peticion_Counter != -2:
+            if Status_Peticion_Counter == -1: # Error en el counter
+                Status_Peticion_Dispo = Decision_Dispositivo(R_Teclas,T_A)
+                print(Status_Peticion_Dispo)
+                if  Status_Peticion_Dispo != -2:
+                    if  Status_Peticion_Dispo == -1:# Error en el  Dispositivo
+                        Accion_Torniquete ('Error') # Qr no valido
+                else: Accion_Torniquete ('Error') # Qr no valido
+        else: Accion_Torniquete ('Error') # Qr no valido
+        # Decision_Counter(R_Teclas, T_A)
 
     # ---------------------------------------------------------
     elif  Prioridad == '2':
@@ -148,8 +160,96 @@ def Decision_Server(Teclado, Tiempo_Actual):
     # return 1  # respuesta del servidor valida
     return -2
 
+#---------------------------------------------------------
+#----       Ruta para que autorise el counter
+#---------------------------------------------------------
+def Decision_Counter(TECLADO, Tiempo_Actual):
+    TCL_ENCR=MD5(TECLADO)
+    Respuesta, conteo = Enviar_QR_Counter("."+TCL_ENCR, Tiempo_Actual)
+    if PT_Mensajes: print 'Respuesta: ' + str(Respuesta)
+    if "Access granted" in Respuesta:                           # Entradas/Salidas Autorizadas
+        Accion_Torniquete (Respuesta)
+        # verificar si hay registros del usuario
+        Pos_linea, Tipo_IO = Buscar_acceso_Tipo1(TCL_ENCR)
+        Guardar_Autorizacion_General_Tipo_1("."+TCL_ENCR, Tiempo_Actual, Pos_linea, Respuesta, '1') # status internet en 1
+        return 1
 
+    elif Respuesta.find("Access denied") != -1:          # Autorizaciones denegadas
+        Accion_Torniquete (Respuesta)
+        return 1
 
+    else :                                                      # Sin internet Momentanio o fallo del servidor
+        if PT_Mensajes: print 'Sin internet o Fallo del counter'
+        return -1
+#---------------------------------------------------------
+#----       Ruta para que autorise el Dispositivo
+#---------------------------------------------------------
+def Decision_Dispositivo(TECLADO, Tiempo_Actual):
+    TCL_ENCR=MD5(TECLADO)
+    Pos_linea, Resp = Decision_PIN(TCL_ENCR)
+    if Resp.find("Denegado") == -1:                           
+        Accion_Torniquete (Resp)
+        Dato = Guardar_Autorizacion_General_Tipo_1("."+TCL_ENCR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+        # ----desicion a quie envio lo autorizado
+        Prioridad = Get_File(CONF_AUTORIZACION_TECLADO).strip()
+        if Prioridad == '0': # solo enviar lo autorizado al servidor
+            Enviar_Autorizado_Server(Dato) # envio general
+        if Prioridad == '1': # solo enviar lo autorizado al counter
+            Enviar_Autorizado_Counter(Dato) # envio general
+
+        return 1                                                # funcionamiento con normalidad
+    else :                                                      # denegado
+        Accion_Torniquete (Resp)
+        return 1                                                # funcionamiento con normalidad
+#------------------------------------------------------------------------------------------------------------
+
+def Decision_PIN(TECLADO):
+    global PT_Mensajes
+
+    ID= TECLADO.strip()
+    if PT_Mensajes: print ID
+    ID_1 = Buscar_PIN(ID)
+    #print ID_1
+    if ID_1 != -1:
+        #print 'verificar tipo de autorizacion'
+        Pos_linea,Tipo_IO =Buscar_acceso_Tipo1(ID)
+        if Pos_linea == -1 :    return -1,'Access granted-E'    # esta el usuario pero no tiene registro
+        else:
+            if Tipo_IO == '0':      # 0: entrada.1: salida .
+                return Pos_linea,'Access granted-S'             # registro de entrada otorga salida
+            elif Tipo_IO == '1':    # 0: entrada.1: salida .
+                return Pos_linea,'Access granted-E'             # registro de entrada otorga Entrada
+
+        return -1,'Denegado'
+    else:
+        return -1,'Denegado'
+
+def Buscar_PIN(ID_1):  # se puede mejorar la busqueda (busqueda binaria) si la lista esta ordenada
+    Usuarios = Get_File(TAB_USER_TIPO_1)
+    for linea in Usuarios.split('\n'):
+        #print linea.count('.')
+        if linea.count('.') >=1:
+            s=linea.rstrip('\n')
+            s=s.rstrip('\r')
+            s2 =s.split(".")
+            # print s2[1]
+            if 	ID_1 ==	s2[1]:
+                #print 'existe el usuario'
+                return s2[0]
+    return -1
+
+def Buscar_acceso_Tipo1(ID_1):
+    Usuarios = Get_File(TAB_AUTO_TIPO_1)
+    Pos_linea=1  # comnesae en 1 para convenzar la linea cero
+    for linea in Usuarios.split('\n'):
+        if linea.count('.') >=1:
+            #print linea
+            s=linea.rstrip('\n')
+            s=s.rstrip('\r')
+            s2 =s.split(".")
+            if 	ID_1 ==	s2[1]:      return Pos_linea, s2[4] # retorno el estado y linea del usuarios
+        Pos_linea= 1 + Pos_linea
+    return -1,-1
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
@@ -157,22 +257,22 @@ def Decision_Server(Teclado, Tiempo_Actual):
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
 def Accion_Torniquete (Res):
-    global PP_Mensajes
+    global PT_Mensajes
 
     Res=Res.rstrip('\n')            # eliminar caracteres extras
     Res=Res.rstrip('\r')            # eliminar caracteres extras
 
     if Res == 'Access granted-E':
-        #if PP_Mensajes: print "Access granted-E"
+        #if PT_Mensajes: print "Access granted-E"
         Set_File(COM_LED , 'Access granted-E')
         Set_File(COM_RELE, 'Access granted-E')
 
     elif Res == 'Access granted-S':
-        #if PP_Mensajes: print "Access granted-S"
+        #if PT_Mensajes: print "Access granted-S"
         Set_File(COM_LED , 'Access granted-S')
         Set_File(COM_RELE, 'Access granted-S')
     else :
-        #if PP_Mensajes: print "Denegado"
+        #if PT_Mensajes: print "Denegado"
         Set_File(COM_LED, 'Error')
 
 
@@ -188,7 +288,7 @@ def revicion_Teclado ():
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
-print 'Ciclo principal lectura Teclado'
+if PT_Mensajes: print 'Ciclo principal lectura Teclado'
 Set_File(COM_LED, '0')
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------

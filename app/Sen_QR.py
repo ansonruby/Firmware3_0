@@ -60,7 +60,7 @@ def Tx_datos():
     #Para dispotitos CCCB
     #-------------------------------
     rele = Get_File(COM_TX_RELE)
-    if len(rele)>= 1:        
+    if len(rele)>= 1:
         port.write(rele)
         Clear_File(COM_TX_RELE)
 #---------------------------------------------------------------------------------------
@@ -90,7 +90,10 @@ def Nueva_Avilitacion_portiempo_y_Tipo():
     #print 'Repe_Nueva habilitacion'
     puntos = QR.count(".")
     #print puntos
-    if puntos == 3:
+    if puntos == 1:
+        if SQ_Mensajes: print 'R_Avi Tiket: '+QR
+        Set_File(STATUS_QR, '1')
+    elif puntos == 3:
         if SQ_Mensajes: print 'R_Avi Tiket: '+QR
         Set_File(STATUS_QR, '1')
     elif puntos == 4:               #para tipo 3
