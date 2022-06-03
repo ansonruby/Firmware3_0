@@ -32,7 +32,7 @@ from lib.Lib_Encryp import *            # importar con los mismos nombres
 #-------------------------------------------------------
 # inicio de variable	--------------------------------------
 
-FTN_Mensajes = 1     # 0: NO print  1: Print
+FTN_Mensajes = 0     # 0: NO print  1: Print
 
 
 
@@ -47,7 +47,7 @@ def Decision_Tipo_NFC(NFC_Md5):
 
 
     Veri_Impreso,Usuario = Buscar_NFC(NFC_Md5)
-    print Veri_Impreso
+    #print Veri_Impreso
 
     if Veri_Impreso != 0 :
         Pos_linea,Tipo_IO =Buscar_acceso_NFC(NFC_Md5)
@@ -90,7 +90,7 @@ def Buscar_acceso_NFC(ID_1):
     Pos_linea=1  # comiensa en 1 para convenzar la linea cero
     for linea in Usuarios.split('\n'):
         if linea.count('.') >=1:
-            print linea
+            #print linea
             s=linea.rstrip('\n')
             s=s.rstrip('\r')
             s2 =s.split(".")
@@ -111,6 +111,7 @@ def Guardar_Autorizacion_General_NFC(NFC, Tiempo_Actual, Pos_linea, Res, Status_
         Dato = '6.' + NFC + '.' + Tiempo_Actual +  '.' + Tipo +  '.' + Rest +  '.' + Status_Internet + '\n'
 
         if FTN_Mensajes:
+            print Tipo+'hh'
             print 'Registro: ' + Dato
 
         if Pos_linea != -1 :    Update_Line(TAB_AUTO_TIPO_6, Pos_linea, Dato)
@@ -175,3 +176,68 @@ def Enviar_Autorizado_Counter(Dato):
                 Total = heder + '.' + str(Contador) + '\n' + Data + Dato + '\n'
                 #print Total
                 Set_File(CONT_SEND_DATA_PATH, heder + '.' + str(Contador) + '\n' + Data + Dato + '\n')
+
+
+
+#---------------------------------------------------------
+#---------------------------------------------------------
+#-------            Envios genelares de informacion a counter o servidor
+#---------------------------------------------------------
+#---------------------------------------------------------
+
+def Enviar_NFC_Counter(QR, Tiempo_Actual):
+    global FTN_Mensajes
+    if Get_File(CONT_SEND_FLAG_PATH) == "":
+        Heder = 'header.authTicket.1.'+Tiempo_Actual+'\n'
+        Dato_TX = QR + '\n'
+        Total_TX = Heder + Dato_TX
+        # print Total_TX
+        Set_File(CONT_SEND_DATA_PATH, Total_TX)  # enviar el QR
+        Set_File(CONT_SEND_FLAG_PATH, '1')
+        T_E = T_Antes = -1
+        while 1:
+            if Get_File(CONT_RECEIVED_FLAG_PATH) == "1":
+                if FTN_Mensajes:    print 'Respuesta :'
+                Resp = Get_File(CONT_RECEIVED_DATA_PATH)
+                Resps = Resp.split("\n")
+
+                # print Resps[0]
+                # print Resps[1]
+                if len(Resps) > 1:
+                    Heder_res = Resps[0].split('.')
+                    Accion_res = Resps[1].split('.')
+                    # print Heder_res[1]
+                    # print Accion_res[0]
+
+                    if Heder_res[1] == 'authTicket':
+                        if FTN_Mensajes:
+                            print 'Tipo: ' + Accion_res[0]
+                            print 'Contador:' + Accion_res[1]
+
+                        Clear_File(CONT_RECEIVED_DATA_PATH)
+                        Clear_File(CONT_RECEIVED_FLAG_PATH)
+                        return Accion_res[0], Accion_res[1]
+
+                    else:
+                        if FTN_Mensajes:
+                            print 'Es otra comunicacion'
+
+            if T_Antes == -1:
+                T_E = int(time.time()*1000.0)  # Tiempo
+                T_Antes = T_E
+            else:
+                T_E = int(time.time()*1000.0)  # Tiempo
+            Tiempo_diferencia = T_E - T_Antes
+            # print str(Tiempo_diferencia)
+            if Tiempo_diferencia >= 2000:
+                if FTN_Mensajes:    print 'procesar por no respuesta T:' + str(Tiempo_diferencia)
+                Clear_File(CONT_SEND_DATA_PATH)
+                Clear_File(CONT_SEND_FLAG_PATH)
+                Clear_File(CONT_RECEIVED_DATA_PATH)
+                Clear_File(CONT_RECEIVED_FLAG_PATH)
+                return 'Error',"-1"
+
+    else:
+        if FTN_Mensajes:    print 'Error en la comunicacion : Flag No vacio'
+        return 'Error',"-1"
+#---------------------------------------------------------
