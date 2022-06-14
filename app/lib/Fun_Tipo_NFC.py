@@ -75,12 +75,13 @@ def Buscar_NFC(NFC): #mejorar por que podia pasa cualquiera
     Usuarios = Get_File(TAB_USER_TIPO_6)
     for linea in Usuarios.split('\n'):
         #print linea.count('.')
-        Vector = linea.split(".")
-
-        if 	NFC == Vector[1]:
-            Contador +=1
-            #print Vector[1]
-            return Contador,linea
+        if linea.count('.') >= 1:
+            Vector = linea.split(".")
+            TaCadena = len (NFC)
+            if 	NFC == Vector[1]:
+                Contador +=1
+                #print Vector[1]
+                return Contador,linea
 
     return Contador,""
 

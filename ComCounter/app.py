@@ -199,7 +199,7 @@ class WsEvents(Websocket):
 
             ff.close()
         self.broadcast(json.dumps({'type': 'update', 'status': '1'}))
-        self.LAST_MESSAGE_TIME = int(time.time())
+        # self.LAST_MESSAGE_TIME = int(time.time())
 
     def onDisconnect(self):
         with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
@@ -212,11 +212,15 @@ class WsEvents(Websocket):
         with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
             ffw.write("3")
             ffw.close()
-        self.close()
+        # self.close()
         if self.print_msg:
             print('[SERVER]= Closed conection from'+str(self.addr))
 
 
+with open(SEND_FLAG_PATH, 'w', encoding='utf-8', errors='replace') as ffw:
+    ffw.write("3")
+    ffw.close()
+    
 server = WebsocketServer("0.0.0.0", SERVER_PORT, 2,
                          SHOW_PRINT_MSG, ws_cls=WsEvents)
 server.run()

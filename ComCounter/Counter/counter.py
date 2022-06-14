@@ -15,6 +15,7 @@ import uuid
 import logging
 import datetime
 import subprocess
+import ast
 
 CURRENT_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -36,6 +37,9 @@ LAST_LOG_LIST_PATH = DB_DIR_NAME+"/lastLog.txt"
 ACTIVE_CONECTION = CURRENT_DIR_PATH+"/../db/flagtosend.txt"
 
 # Cloud server constants
+SERVER_UPDATE_TIME = 3600
+
+# Cloud server variables
 cloud_server_domain = ""
 login_token = ""
 bookingOffice_id = ""
@@ -79,7 +83,7 @@ def Get_Rout_server():
 
 
 def log_in():
-    data = encrypt({"attributes": {'email': "taquilla.lagos@comfamiliar.com",
+    data = encrypt({"attributes": {'email': "admin_wicho@fusepong.com",
                                    'password': "password"}}).decode("utf-8")
     petition = requests.post(
         url=cloud_server_domain+"/api/users/sign_in",
@@ -104,6 +108,33 @@ def get_devices():
 
 
 def get_users():
+    tickets_offline = None
+    with open(OFFLINE_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
+        tickets_offline_text = df.read().strip()
+        df.close()
+        if tickets_offline_text.strip() != "":
+            tickets_offline = tickets_offline_text.split("\n")
+    if tickets_offline:
+        tickets_offline_json = []
+        for ticket in tickets_offline:
+            ticket_json = {}
+            if ticket.strip() == "":
+                continue
+
+            ticket_json = json.loads(ticket)
+            if not "user_id" in ticket_json:
+                ticket_json["user_id"] = bookingOffice_id
+            tickets_offline_json.append(ticket_json)
+        petition = requests.post(
+            url=cloud_server_domain+"/api/access/update_scan_actions",
+            data={"data": encrypt(
+                {"tickets": tickets_offline_json})},
+            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
+        if petition.status_code == 201 or petition.status_code == 202:
+            with open(OFFLINE_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+                dfw.write("")
+                dfw.close()
+
     in_out = None
     with open(AUTH_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
         auth_list_text = df.read().strip()
@@ -111,11 +142,11 @@ def get_users():
         if auth_list_text.strip() != "":
             in_out = auth_list_text.split("\n")
     if in_out:
-        print(requests.post(
+        requests.post(
             url=cloud_server_domain+"/api/access/update_scan_actions",
             data={"data": encrypt(
                 {"bookingOffice_id": bookingOffice_id, "in_out": in_out})},
-            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token}))
+            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
         with open(AUTH_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
             dfw.write("")
             dfw.close()
@@ -158,7 +189,7 @@ def save_users(data):
     return granted_users
 
 
-def auth_petition(qr):
+def auth_petition(qr, ws):
     qr_list = []
     data = qr.split(".")
     ans = False
@@ -210,7 +241,8 @@ def auth_petition(qr):
             break
     if ans == True:
         with open(AUTH_LIST_PATH, 'a', encoding='utf-8', errors='replace') as dfw:
-            dfw.write(qr+"."+str(int(time.time()*1000.0))+".1.0.1\n")
+            dfw.write(qr+"."+str(int(time.time()*1000.0)) +
+                      ".1.0.1."+str(ws.server_id)+"\n")
             dfw.close()
     return ans
 
@@ -249,20 +281,20 @@ def create_ticket(ticket):
     return valid_ref_number
 
 
-def search_user():
+def search_user_tickets(identification_number):
     offline_list = []
     with open(OFFLINE_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
         offline_list_text = df.read().strip()
         df.close()
         if offline_list_text.strip() != "":
             offline_list = offline_list_text.split("\n")
-    for existent_ticket in offline_list:
-        if existent_ticket.strip() == "":
+    for existent_ticket_text in offline_list:
+        if existent_ticket_text.strip() == "":
             continue
-        existent_ticket = json.loads(existent_ticket)
-        if existent_ticket["ref_number"] == ticket["ref_number"]:
-            valid_ref_number = False
-            break
+        existent_ticket = json.loads(existent_ticket_text)
+        if int(existent_ticket["identification_number"]) == int(identification_number):
+            return ";".join(["<"+existent_ticket["qr"]+"."+str(int(time.time()*1000.0))+">"]*int(existent_ticket["uses"]))
+    return None
 
 
 def encrypt(data):
@@ -274,6 +306,21 @@ def encrypt(data):
     data += pad * chr(pad)
     encyrpted_data = base64.b64encode(cipher.encrypt(data)).strip()
     return encyrpted_data
+
+
+def server_updater():
+    while True:
+        desconnection = True
+        if os.path.exists(ACTIVE_CONECTION):
+            with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
+                desconnection = df.read().strip() == "3"
+                df.close()
+        if desconnection:
+            # print("desconected")
+            break
+        if login_token != "":
+            get_users()
+        time.sleep(SERVER_UPDATE_TIME)
 
 
 def socket_guardian():
@@ -290,20 +337,21 @@ def socket_guardian():
                                                     on_error=socket_on_error,
                                                     on_close=socket_on_close)
                         ws.procesing = True
+                        ws.server_id = device["id"]
                         device["ws"] = ws
                         ws.run_forever()
                     Thread(target=ws_run).start()
                 elif not device["ws"].procesing:
                     device["ws"].send(json.dumps(
                         {'type': "Test connection", 'status': "1"}))
-            except:
-                print("error in "+device["ip"])
+            # except:
+                #print("error in "+device["ip"])
             finally:
                 new_active_devices.append(device)
 
         active_devices = new_active_devices
 
-        time.sleep(1)
+        time.sleep(0.8)
 
         desconnection = True
         if os.path.exists(ACTIVE_CONECTION):
@@ -311,7 +359,7 @@ def socket_guardian():
                 desconnection = df.read().strip() == "3"
                 df.close()
         if desconnection:
-            print("desconected")
+            # print("desconected")
             break
 
 
@@ -324,10 +372,10 @@ def socket_on_open(ws):
 
 
 def socket_on_message(ws, msg):
-    print(ws.url)
+    # print(ws.url)
     try:
         msg = msg.strip()
-        print(msg)
+        # print(msg)
         ws.procesing = True
         req = msg.split("////\n")
         header = json.loads(req[0])
@@ -343,31 +391,31 @@ def socket_on_message(ws, msg):
         else:
             if header["type"] == "authTicket":
                 access = ""
-                if auth_petition(req[1]) == True:
+                if auth_petition(req[1], ws) == True:
                     access = "Access granted-E.0"
                 else:
                     access = "Access denied.-1"
-                print(access)
+                # print(access)
                 ws.send(json.dumps(
                     {'type': "authTicket", 'status': "1", 'size': 1})+"////\n"+access)
             ws.send(json.dumps({'type': "recived", 'status': "1"}))
 
         ws.procesing = False
     except:
-        print("message error")
+        #print("message error")
         ws.close()
 
 
 def socket_on_error(ws, error):
     ws.sock = None
     ws.close()
-    print(error)
+    # print(error)
 
 
 def socket_on_close(ws, close_status_code, close_msg):
     ws.sock = None
     ws.close()
-    print("Closed")
+    # print("Closed")
 
 
 def server_http():
@@ -415,9 +463,28 @@ def server_http():
         else:
             return {"status": 401, "error_message": "Token de acceso invalido"}, 401
 
-    # log = logging.getLogger("werkzeug")
-    # log.disabled = True
-    # app.logger.disabled = True
+    @app.route('/search_active_tickets', methods=['POST'])
+    def search_active_tickets():
+        last_log_data = []
+        with open(LAST_LOG_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
+            last_log_text = df.read().strip()
+            df.close()
+            last_log_data = last_log_text.split("\n")
+        auth = request.headers.get("Authorization") or request.headers.get(
+            "authorization") or request.headers.get("AUTHORIZATION")
+        if auth.strip() == "Bearer "+last_log_data[0]:
+            ticket_list = search_user_tickets(base64.b64decode(
+                request.json['identification_number']).decode('utf-8'))
+            if ticket_list:
+                return {"status": 200, "tickets": ticket_list}, 200
+            else:
+                return {"status": 422, "error_message": "EL usuario no posee acceso"}, 422
+        else:
+            return {"status": 401, "error_message": "Token de acceso invalido"}, 401
+
+    log = logging.getLogger("werkzeug")
+    log.disabled = True
+    app.logger.disabled = True
     CORS(app)
     serve(app, host="0.0.0.0", port=8081)
 
@@ -468,10 +535,11 @@ if __name__ == "__main__":
                         device = {"ip": "ws://"+device_ip[0] +
                                   ":1234/", "id": device_ip[1], "active": True}
                         active_devices.append(device)
-                print(active_devices)
-                get_users()
+                # #print(active_devices)
+                Thread(target=server_updater).start()
+                # get_users()
 
                 socket_guardian()
-            else:
-                print('Custom Error {}'.format(ips[1]))
+            # else:
+                #print('Custom Error {}'.format(ips[1]))
         time.sleep(0.5)

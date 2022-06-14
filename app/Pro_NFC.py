@@ -211,7 +211,7 @@ def Decision_Counter(NFC, Tiempo_Actual):
         # verificar si hay registros del usuario
         Veri_Impreso,Usuario = Buscar_NFC(NFC_Md5)
         Pos_linea,Tipo_IO =Buscar_acceso_NFC(NFC_Md5)
-        Guardar_Autorizacion_General_NFC(Usuario.strip(), Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
+        Guardar_Autorizacion_General_NFC(Usuario.strip(), Tiempo_Actual, Pos_linea, Respuesta, '1') # guardar un registro de lo autorizado
         return 1
 
     elif Respuesta.find("Access denied") != -1:          # Autorizaciones denegadas

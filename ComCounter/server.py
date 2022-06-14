@@ -169,22 +169,23 @@ class Websocket(threading.Thread):
         self.close()
 
     def broadcast(self, message):
+        try:
+            if type(message) == str:
+                opcode = self.TEXT
+                payload_data = message.encode('utf-8')
+            elif type(message) == bytes:
+                opcode = self.BINARY
+                payload_data = message
+            else:
+                raise Exception("Message has to be string or bytes")
 
-        if type(message) == str:
-            opcode = self.TEXT
-            payload_data = message.encode('utf-8')
-        elif type(message) == bytes:
-            opcode = self.BINARY
-            payload_data = message
-        else:
-            raise Exception("Message has to be string or bytes")
+            frame = self.build_frame(payload_data, opcode)
 
-        frame = self.build_frame(payload_data, opcode)
-
-        for t in self.connections:
-            if t.conn and self.state != self.CLOSED:
-                t.conn.sendall(frame)
-
+            for t in self.connections:
+                if t.conn and self.state != self.CLOSED:
+                    t.conn.sendall(frame)
+        except:
+            self.onError()
     def close(self):
         self.conn.shutdown(socket.SHUT_RDWR)
         self.conn.close()
