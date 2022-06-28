@@ -156,6 +156,9 @@ def Decision_Dispositivo(NFC, Tiempo_Actual):
 
     Pos_linea, Resp, Usuario = Decision_Tipo_NFC(NFC_Md5)
 
+    if PN_Mensajes: print Resp
+    #if PN_Mensajes: print Pos_linea
+
     if Resp.find("Denegado") == -1:                           # Entradas/Salidas Autorizadas
         Accion_Torniquete (Resp)
         Dato = Guardar_Autorizacion_General_NFC(Usuario.strip(), Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
@@ -238,23 +241,32 @@ def Decision_Counter(NFC, Tiempo_Actual):
 #-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
 def Accion_Torniquete (Res):
-    global PP_Mensajes
+    global PN_Mensajes
 
     Res=Res.rstrip('\n')            # eliminar caracteres extras
     Res=Res.rstrip('\r')            # eliminar caracteres extras
+    if PN_Mensajes: print Res
 
     if Res == 'Access granted-E':
-        #if PP_Mensajes: print "Access granted-E"
+        if PN_Mensajes: print "L_Access granted-E"
         Set_File(COM_LED , 'Access granted-E')
         Set_File(COM_RELE, 'Access granted-E')
+
+        Set_File(COM_TX_RELE, 'Access granted-E')
+
 
     elif Res == 'Access granted-S':
         #if PP_Mensajes: print "Access granted-S"
         Set_File(COM_LED , 'Access granted-S')
         Set_File(COM_RELE, 'Access granted-S')
+
+        Set_File(COM_TX_RELE, 'Access granted-E')
+
     else :
-        #if PP_Mensajes: print "Denegado"
+        if PN_Mensajes: print "Denegado"
         Set_File(COM_LED, 'Error')
+
+        Set_File(COM_TX_RELE, 'Error')
 
 
 

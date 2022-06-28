@@ -423,13 +423,13 @@ def equlbut():  #para el boton OK  #hacer un hilo para procesar los ruts
     Set_File(COM_BUZZER, '1')           # activar sonido por 500*1
     Contador_Menu=0
     if len(operator) > 0:
-        #Set_File(COM_TECLADO, operator) # escrivir en archivo para procesar
-        Set_File(COM_NFC, operator) # escrivir en archivo para procesar      # simulacion NFC
+        Set_File(COM_TECLADO, operator) # escrivir en archivo para procesar
+        #Set_File(COM_NFC, operator) # escrivir en archivo para procesar      # simulacion NFC
         operator=""
         Memoria=""
         Texto_Display  = operator
-        #Set_File(STATUS_TECLADO, '1')       # Estado de teckas para enviar a servidor
-        Set_File(STATUS_NFC, '1')           # simulacion NFC
+        Set_File(STATUS_TECLADO, '1')       # Estado de teckas para enviar a servidor
+        #Set_File(STATUS_NFC, '1')           # simulacion NFC
 
 
 #--- funcion principal de evento de botones

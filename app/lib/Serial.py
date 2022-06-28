@@ -33,14 +33,14 @@ from serial import SerialException
 #           Librerias personales
 #---------------------------------
 
-from lib.Lib_File import *  # importar con los mismos nombres
-from lib.Lib_Rout import *  # importar con los mismos nombres
+from Lib_File import *  # importar con los mismos nombres
+from Lib_Rout import *  # importar con los mismos nombres
 
 #-----------------------------------------------------------
 #                       CONSTANTES
 #-----------------------------------------------------------
 
-SQ_Mensajes = 1     # 0: NO print  1: Print
+SQ_Mensajes = 0     # 0: NO print  1: Print
 
 Puerto_Serial = '/dev/ttyS0'
 port = serial.Serial(Puerto_Serial, baudrate=9600, timeout=1)
@@ -56,11 +56,17 @@ T_Repe_QR = 0       # timepo de inicioa de un nuevo qr
 
 
 def Tx_datos():
+    global SQ_Mensajes
     #-------------------------------
     #Para dispotitos CCCB
     #-------------------------------
     rele = Get_File(COM_TX_RELE)
     if len(rele)>= 1:
+        rele=rele.rstrip('\n')            # eliminar caracteres extras
+        rele=rele.rstrip('\r')
+        if rele == 'Access granted-E': rele = 'EEEEE'
+        else: rele = 'DDDDD'
+        if SQ_Mensajes: print 'TX:' + rele
         port.write(rele)
         Clear_File(COM_TX_RELE)
 #---------------------------------------------------------------------------------------
@@ -165,7 +171,65 @@ def Parte_Fin_QR(x):
 
 
 
+#---------------------------------------------------------------------------------------
 
+def Decision_Telado(Teclado):
+    if SQ_Mensajes: print 'TC:'+ Teclado
+    Guardar_Telado(Teclado)
+    Activar_Telado()
+
+#---------------------------------------------------------------------------------------
+
+def Guardar_Telado(Teclado):
+    TecladoG = Teclado.replace ("<","")
+    TecladoG = TecladoG.replace (">","")
+    TecladoG = TecladoG.replace ("TC:","")
+    Clear_File(COM_TECLADO)          # Borrar QR
+    Set_File(COM_TECLADO, TecladoG)       # Guardar QR
+
+#---------------------------------------------------------------------------------------
+
+def Activar_Telado():
+    Set_File(STATUS_TECLADO, '1')    #Escrivir_Estados('1',8) # Cambiar estado del QR
+
+
+
+
+
+
+#---------------------------------------------------------------------------------------
+
+def Decision_Tag(Tag):
+
+    if 'TN:' in Tag:
+        if SQ_Mensajes: print 'TN:'+ Tag
+        Guardar_Tag(Tag)
+        Activar_Tag()
+    elif 'TR:' in Tag:
+        if SQ_Mensajes: print 'TR:'+ Tag
+        #Set_File(STATUS_REPEAT_NFC, '2')    # Estado QR repetido
+        Guardar_Tag(Tag)
+        Activar_Tag()
+
+
+
+
+
+#---------------------------------------------------------------------------------------
+
+def Activar_Tag():
+    Set_File(STATUS_NFC, '1')    #Escrivir_Estados('1',8) # Cambiar estado del QR
+
+#---------------------------------------------------------------------------------------
+
+def Guardar_Tag(Tag):
+    #global QR
+    TagG = Tag.replace ("<","")
+    TagG = TagG.replace (">","")
+    TagG = TagG.replace ("TN:","")
+    TagG = TagG.replace ("TR:","")
+    Clear_File(COM_NFC)          # Borrar QR
+    Set_File(COM_NFC, TagG)       # Guardar QR
 
 
 
@@ -176,7 +240,6 @@ def Parte_Fin_QR(x):
 
 
 #---------------------------------------------------------------------------------------
-
 def Validar_QR(x):
     TaCadena = len (x)
     Inicio = x[0:1]
@@ -191,18 +254,51 @@ def Validar_QR(x):
     else:                                           return -2   #print 'NO' no hay cadena
 
 #---------------------------------------------------------------------------------------
+def Validar_Trama(x):
+    TaCadena = len (x)
+    Inicio = x[0:1]
+    Fin = x[TaCadena-1:TaCadena]
+    #print TaCadena
+    if TaCadena >= 1:
+        if (Inicio == '<' ) and (Fin == '>'):       return 1    #print 'OK' valido y completo
+        else:
+            if (Inicio == '<' ):                    return 2    #print 'Inicio: ' + Inicio parte inicial de un qr valido
+            elif (Fin == '>'):                      return 3    #print 'Fin' + Fin parte final de un qr valido
+            else:                                   return -1   #print 'NO' no tine ninguna parte valida
+    else:                                           return -2   #print 'NO' no hay cadena
 
+#---------------------------------------------------------------------------------------
+def Almacenar_Trama(x):
+    #print 'Valido:' + x
+    if 'TN:' in x:      Decision_Tag(x)#print 'tag'
+    elif 'TR:' in x:    Decision_Tag(x)#print 'tag'
+    elif 'TC:' in x:    Decision_Telado(x)#print 'tag'
+    else:               Decision_Qr(x)#print 'QR'
+
+
+
+#---------------------------------------------------------------------------------------
 def Procesar_Datos(rcv):
     global SQ_Mensajes
     #if SQ_Mensajes: print 'Datos RX:' + rcv
     Lineas = rcv.split('\r')
     for x in Lineas:
-        Valido = Validar_QR(x)
-        if      Valido == 1:    Decision_Qr(x)          #QR valido
-        elif    Valido == 2:    Parte_Inicial_QR(x)     #Inicio QR
-        elif    Valido == 3:    Parte_Fin_QR(x)         #Fin QR
-        elif    Valido == -1:   No_Valido_QR(x)         #No valido
-        #elif    Valido == -2:   print Valido #basio no hay cadena
+        if(len(x)>0):
+            #print 'RX_1:' + x +'Tama:'+ str(len(x))
+            Valido = Validar_Trama(x)
+            if      Valido == 1:    Almacenar_Trama(x)#print 'Valido:' + x #print 'QR valido' #Decision_Qr(x)          #QR valido
+            elif    Valido == 2:    Parte_Inicial_QR(x) #print 'Inicio QR' #Parte_Inicial_QR(x)     #Inicio QR
+            elif    Valido == 3:    Parte_Fin_QR(x) #print 'Fin QR'    #Parte_Fin_QR(x)         #Fin QR
+            #elif    Valido == -1:   print 'No valido:' + x +'Tama:'+ str(len(x)) #print 'No valido' #No_Valido_QR(x)         #No valido
+            """
+            #Valido = Validar_QR(x)
+            if      Valido == 1:    Decision_Qr(x)          #QR valido
+            elif    Valido == 2:    Parte_Inicial_QR(x)     #Inicio QR
+            elif    Valido == 3:    Parte_Fin_QR(x)         #Fin QR
+            elif    Valido == -1:   No_Valido_QR(x)         #No valido
+            #elif    Valido == -2:   print Valido #basio no hay cadena
+            """
+
 
 
 
@@ -221,6 +317,7 @@ def Datos_Serial():
             T_rcv = len(rcv)
             if T_rcv >= 1:
                 #if SQ_Mensajes: print 'Cuantos:' + str(T_rcv)
+                #print 'RX:' + rcv
                 Procesar_Datos(rcv)
 
 

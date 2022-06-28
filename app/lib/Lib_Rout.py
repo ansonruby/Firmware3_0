@@ -179,6 +179,11 @@ COM_ACTUALIZADOR        = FIRM + COMMA + 'Actualizador/Forzar_Actualizador.txt'
 #---------------------------------------------------------------------------------------
 #                                   NFC
 #---------------------------------------------------------------------------------------
+
 COM_NFC                 = FIRM + COMMA + 'Nfc/Com_Nfc.txt'                        # Datos leidos del Nfc
 STATUS_NFC              = FIRM + STATUS + 'Nfc/Status_Nfc.txt'                    # Estado del Nfc
 STATUS_REPEAT_NFC       = FIRM + STATUS + 'Nfc/Repeat_Nfc.txt'                    # Estado de repeticion del Nfc
+
+#---------------------------------------------------------------------------------------
+#                                   Pila fifo
+#---------------------------------------------------------------------------------------

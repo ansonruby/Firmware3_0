@@ -77,34 +77,42 @@ def Get_Rout_server():
                 '1110': 'https://' + IP_Ser,
                 '1111': 'https://' + IP_Ser}
 
-    # return 'https://staging.fusepong.com'
-    # return 'http://192.168.122.160:3000'
+    # return 'https://solutions.fusepong.com'
+    # return 'http://192.168.20.41:3000'
     return opciones[mejor_opcion]
 
 
 def log_in():
     data = encrypt({"attributes": {'email': "admin_wicho@fusepong.com",
                                    'password': "password"}}).decode("utf-8")
-    petition = requests.post(
-        url=cloud_server_domain+"/api/users/sign_in",
-        # data={"data": encrypt(
-        #     {"attributes": {'email': "luding@counter.com", 'password': "password"}})},
-        data={"data": data},
-        headers={'X-Device-ID': str(DEVICE_CURRENT_UUID)})
-    if petition.status_code == 201:
-        with open(LAST_LOG_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
-            dfw.write(data)
-            dfw.close()
-        return [petition.json()['data']['id'], petition.json()['meta']['authentication_token']]
+    # data = encrypt({"attributes": {'email': "luding@counter.com",
+    #                'password': "password"}}).decode("utf-8")
+    try:
+        petition = requests.post(
+            url=cloud_server_domain+"/api/users/sign_in",
+            data={"data": data},
+            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID)})
+        if petition.status_code == 201:
+            with open(LAST_LOG_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+                dfw.write(data)
+                dfw.close()
+            return [petition.json()['data']['id'], petition.json()['meta']['authentication_token']]
+    except:
+        print("not internet connection")
 
 
 def get_devices():
-    petition = requests.get(
-        url=cloud_server_domain+"/api/app/scan_devices/find_ip_devices",
-        params={"id": bookingOffice_id},
-        headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
-    if petition.status_code == 200:
-        return petition.json()["data"]["scanners"]
+    try:
+        petition = requests.get(
+            url=cloud_server_domain+"/api/app/scan_devices/find_ip_devices",
+            params={"id": bookingOffice_id},
+            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
+        if petition.status_code == 200:
+            return petition.json()["data"]["scanners"]
+        else:
+            return []
+    except:
+        print("not internet connection")
 
 
 def get_users():
@@ -112,7 +120,7 @@ def get_users():
     with open(OFFLINE_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
         tickets_offline_text = df.read().strip()
         df.close()
-        if tickets_offline_text.strip() != "":
+        if tickets_offline_text != "":
             tickets_offline = tickets_offline_text.split("\n")
     if tickets_offline:
         tickets_offline_json = []
@@ -126,7 +134,7 @@ def get_users():
                 ticket_json["user_id"] = bookingOffice_id
             tickets_offline_json.append(ticket_json)
         petition = requests.post(
-            url=cloud_server_domain+"/api/access/update_scan_actions",
+            url=cloud_server_domain+"/api/app/bookings/create_ticket",
             data={"data": encrypt(
                 {"tickets": tickets_offline_json})},
             headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
@@ -139,17 +147,20 @@ def get_users():
     with open(AUTH_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
         auth_list_text = df.read().strip()
         df.close()
-        if auth_list_text.strip() != "":
+        if auth_list_text != "":
             in_out = auth_list_text.split("\n")
+    # print(in_out)
     if in_out:
-        requests.post(
+        # print("in_out")
+        petition = requests.post(
             url=cloud_server_domain+"/api/access/update_scan_actions",
             data={"data": encrypt(
                 {"bookingOffice_id": bookingOffice_id, "in_out": in_out})},
             headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
-        with open(AUTH_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
-            dfw.write("")
-            dfw.close()
+        if petition.status_code == 200 or petition.status_code == 202:
+            with open(AUTH_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+                dfw.write("")
+                dfw.close()
     petition = requests.get(
         url=cloud_server_domain+"/api/access/get_granted_users_pi",
         params={"bookingOffice_id": bookingOffice_id},
@@ -169,7 +180,7 @@ def save_users(data):
     with open(OFFLINE_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
         offline_list_text = df.read().strip()
         df.close()
-        if offline_list_text.strip() != "":
+        if offline_list_text != "":
             offline_list = offline_list_text.split("\n")
             with open(OFFLINE_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
                 dfw.write("")
@@ -193,6 +204,7 @@ def auth_petition(qr, ws):
     qr_list = []
     data = qr.split(".")
     ans = False
+    access_identifier = "1"
     with open(QR_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
         qr_list_text = df.read().strip()
         df.close()
@@ -201,14 +213,20 @@ def auth_petition(qr, ws):
         if compare_qr == "":
             continue
         compare_data = compare_qr.split(".")
-        len(data) == 2
+        if compare_data[0] == "6" and data[0] == "6" and compare_data[2] == data[1]:
+            access_identifier = "11"
+            ans = True
+            break
         if len(data) == 2 and len(compare_data) == 2 and data[1] == compare_data[0]:
+            access_identifier = "1"
             ans = True
             break
         elif len(data) == 2 and len(compare_data) == 2 and data[0] == "" and data[1] == compare_data[1]:
+            access_identifier = "2"
             ans = True
             break
         elif len(data) == 5 and len(compare_data) == 5 and ".".join(data[0:-1]) == ".".join(compare_data[0:-1]):
+            access_identifier = "1"
             offline_list = []
             with open(OFFLINE_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
                 offline_list_text = df.read().strip()
@@ -242,7 +260,7 @@ def auth_petition(qr, ws):
     if ans == True:
         with open(AUTH_LIST_PATH, 'a', encoding='utf-8', errors='replace') as dfw:
             dfw.write(qr+"."+str(int(time.time()*1000.0)) +
-                      ".1.0.1."+str(ws.server_id)+"\n")
+                      "."+access_identifier+".0.1."+str(ws.server_id)+"\n")
             dfw.close()
     return ans
 
@@ -271,6 +289,8 @@ def create_ticket(ticket):
                 ticket["uses"] = ticket["quantity"]
             ticket["qr"] = str(qr_type) + "." + encrypt(bookingOffice_id).decode("utf-8") + \
                 "." + encrypted_rut + "." + "1" + ".0"
+            if not "user_id" in ticket:
+                ticket["user_id"] = bookingOffice_id
             qrs = (ticket["qr"]+"\n")*int(ticket["uses"])
             with open(QR_LIST_PATH, 'a', encoding='utf-8', errors='replace') as dfw:
                 dfw.write(qrs)
@@ -293,7 +313,11 @@ def search_user_tickets(identification_number):
             continue
         existent_ticket = json.loads(existent_ticket_text)
         if int(existent_ticket["identification_number"]) == int(identification_number):
-            return ";".join(["<"+existent_ticket["qr"]+"."+str(int(time.time()*1000.0))+">"]*int(existent_ticket["uses"]))
+            return ";".join(
+                ["<" + ".".join(existent_ticket["qr"].split(".")[0:-1]) +
+                 "." + str(int(time.time()*1000.0)) +
+                 ">"] * int(existent_ticket["uses"])
+            )
     return None
 
 
@@ -344,8 +368,8 @@ def socket_guardian():
                 elif not device["ws"].procesing:
                     device["ws"].send(json.dumps(
                         {'type': "Test connection", 'status': "1"}))
-            # except:
-                #print("error in "+device["ip"])
+            except:
+                print("error in "+device["ip"])
             finally:
                 new_active_devices.append(device)
 
@@ -402,7 +426,7 @@ def socket_on_message(ws, msg):
 
         ws.procesing = False
     except:
-        #print("message error")
+        # print("message error")
         ws.close()
 
 
@@ -437,7 +461,7 @@ def server_http():
             last_log_text = df.read().strip()
             df.close()
             last_log_data = last_log_text.split("\n")
-        credentials = encrypt({"attributes": json.loads(base64.b64decode(
+        credentials = encrypt({"attributes": ast.literal_eval(base64.b64decode(
             request.json['credentials']).decode('utf-8'))}).decode("utf-8")
         if last_log_data[0] == credentials:
             return {"status": 201, "authorization_token": last_log_data[0]}, 201
@@ -454,7 +478,7 @@ def server_http():
         auth = request.headers.get("Authorization") or request.headers.get(
             "authorization") or request.headers.get("AUTHORIZATION")
         if auth.strip() == "Bearer "+last_log_data[0]:
-            valid_ref = create_ticket(json.loads(base64.b64decode(
+            valid_ref = create_ticket(ast.literal_eval(base64.b64decode(
                 request.json['ticket']).decode('utf-8')))
             if valid_ref:
                 return {"status": 201, "message": "Informacion recibida y procesada correctamente"}, 201
@@ -493,53 +517,61 @@ if __name__ == "__main__":
     Thread(target=server_http).start()
     time.sleep(0.8)
     while True:
-        exisṭ_other_connection = False
-        if os.path.exists(ACTIVE_CONECTION):
-            with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
-                exisṭ_other_connection = df.read().strip() != "3"
-                df.close()
-        if not exisṭ_other_connection:
-            ips = subprocess.getstatusoutput('hostname -I')
-            if ips[0] == 0:
-                ips_list = ips[1].strip().split(" ")
-                ip_min_number = float(ips_list[0].split(".")[-1])
-                for ip in ips_list:
-                    ip_numbers = ip.split(".")
-                    if len(ip_numbers) == 4 and float(ip_numbers[-1]) < ip_min_number:
-                        ip_min_number = float(ip_numbers[-1])
-                await_time = ip_min_number
-                time.sleep(await_time)
-                if os.path.exists(ACTIVE_CONECTION):
-                    with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
-                        exisṭ_other_connection = df.read().strip() != "3"
-                        df.close()
-                if exisṭ_other_connection:
-                    continue
-                if not os.path.exists(DB_DIR_NAME):
-                    os.makedirs(DB_DIR_NAME)
-                if not os.path.exists(QR_LIST_PATH):
-                    open(QR_LIST_PATH, 'w', encoding='utf-8',
-                         errors='replace').close()
-                if not os.path.exists(OFFLINE_LIST_PATH):
-                    open(OFFLINE_LIST_PATH, 'w', encoding='utf-8',
-                         errors='replace').close()
+        try:
+            exisṭ_other_connection = False
+            if os.path.exists(ACTIVE_CONECTION):
+                with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
+                    exisṭ_other_connection = df.read().strip() != "3"
+                    df.close()
+            if not exisṭ_other_connection:
+                ips = subprocess.getstatusoutput('hostname -I')
+                if ips[0] == 0:
+                    await_time = 0
+                    try:
+                        ips_list = ips[1].strip().split(" ")
+                        ip_min_number = float(ips_list[0].split(".")[-1])
+                        for ip in ips_list:
+                            ip_numbers = ip.split(".")
+                            if len(ip_numbers) == 4 and float(ip_numbers[-1]) < ip_min_number:
+                                ip_min_number = float(ip_numbers[-1])
+                        await_time = int(ip_min_number/2)
+                    except:
+                        await_time = 0
+                        print("error find ip, defaut await time 0")
+                    time.sleep(await_time)
+                    if os.path.exists(ACTIVE_CONECTION):
+                        with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
+                            exisṭ_other_connection = df.read().strip() != "3"
+                            df.close()
+                    if exisṭ_other_connection:
+                        continue
+                    if not os.path.exists(DB_DIR_NAME):
+                        os.makedirs(DB_DIR_NAME)
+                    if not os.path.exists(QR_LIST_PATH):
+                        open(QR_LIST_PATH, 'w', encoding='utf-8',
+                             errors='replace').close()
+                    if not os.path.exists(OFFLINE_LIST_PATH):
+                        open(OFFLINE_LIST_PATH, 'w', encoding='utf-8',
+                             errors='replace').close()
 
-                cloud_server_domain = Get_Rout_server()
-                credentials = log_in()
-                if credentials:
-                    [bookingOffice_id, login_token] = credentials
+                    cloud_server_domain = Get_Rout_server()
+                    credentials = log_in()
+                    if credentials:
+                        [bookingOffice_id, login_token] = credentials
 
-                active_devices = []
-                for device_ip in get_devices():
-                    if device_ip[0].strip() != "":
-                        device = {"ip": "ws://"+device_ip[0] +
-                                  ":1234/", "id": device_ip[1], "active": True}
-                        active_devices.append(device)
-                # #print(active_devices)
-                Thread(target=server_updater).start()
-                # get_users()
+                    active_devices = []
+                    for device_ip in get_devices():
+                        if device_ip[0] and device_ip[0].strip() != "":
+                            device = {"ip": "ws://"+device_ip[0] +
+                                      ":1234/", "id": device_ip[1], "active": True}
+                            active_devices.append(device)
+                    # #print(active_devices)
+                    Thread(target=server_updater).start()
+                    # get_users()
 
-                socket_guardian()
-            # else:
-                #print('Custom Error {}'.format(ips[1]))
+                    socket_guardian()
+                # else:
+                    # print('Custom Error {}'.format(ips[1]))
+        except:
+            print("not internet connection")
         time.sleep(0.5)

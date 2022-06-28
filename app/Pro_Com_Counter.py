@@ -40,10 +40,10 @@ def add_Tipos_Usuarios_Nuevos(Usuario):
     # -----------------------------------------------------------------------------------------
     #           Formato 2.1 :       azAZ09. azAZ09. 09. 09          -> sha256.id.tiempo init.tiempo fin.
     # -----------------------------------------------------------------------------------------
-    elif puntos == 3:
+    elif puntos == 2: #para sin tipo
         # print '-----Formato 6: 6. azAZ09. azAZ09. 09'
         s2 = Usuario.split(".")
-        ID = s2[1] + '.' + s2[2] + '.' + s2[3]
+        ID = s2[1] + '.' + s2[2] + '.' + '11' #s2[3]
         Add_File(TAB_USER_TIPO_6, ID+'\n')
         #Clear_File(TAB_USER_TIPO_6)
         #Clear_File(TAB_AUTO_TIPO_6)

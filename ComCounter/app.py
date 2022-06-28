@@ -139,6 +139,7 @@ class WsEvents(Websocket):
                         break
                     else:
                         time.sleep(self.SERVER_AWAIT_TIME)
+                break
         else:
             pass
         self.LAST_MESSAGE_TIME = int(time.time())

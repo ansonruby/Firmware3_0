@@ -187,7 +187,7 @@ def Decision_Counter(TECLADO, Tiempo_Actual):
 def Decision_Dispositivo(TECLADO, Tiempo_Actual):
     TCL_ENCR=MD5(TECLADO)
     Pos_linea, Resp = Decision_PIN(TCL_ENCR)
-    if Resp.find("Denegado") == -1:                           
+    if Resp.find("Denegado") == -1:
         Accion_Torniquete (Resp)
         Dato = Guardar_Autorizacion_General_Tipo_1("."+TCL_ENCR, Tiempo_Actual, Pos_linea, Resp, '1') # guardar un registro de lo autorizado
         # ----desicion a quie envio lo autorizado
@@ -267,13 +267,20 @@ def Accion_Torniquete (Res):
         Set_File(COM_LED , 'Access granted-E')
         Set_File(COM_RELE, 'Access granted-E')
 
+        Set_File(COM_TX_RELE, 'Access granted-E')
+
     elif Res == 'Access granted-S':
         #if PT_Mensajes: print "Access granted-S"
         Set_File(COM_LED , 'Access granted-S')
         Set_File(COM_RELE, 'Access granted-S')
+
+        Set_File(COM_TX_RELE, 'Access granted-E')
+
     else :
         #if PT_Mensajes: print "Denegado"
         Set_File(COM_LED, 'Error')
+
+        Set_File(COM_TX_RELE, 'Error')
 
 
 
