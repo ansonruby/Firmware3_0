@@ -185,5 +185,11 @@ STATUS_NFC              = FIRM + STATUS + 'Nfc/Status_Nfc.txt'                  
 STATUS_REPEAT_NFC       = FIRM + STATUS + 'Nfc/Repeat_Nfc.txt'                    # Estado de repeticion del Nfc
 
 #---------------------------------------------------------------------------------------
-#                                   Pila fifo
+#                                  Serial_Modbus
 #---------------------------------------------------------------------------------------
+RX_MODBUS                 = FIRM + COMMA + 'Serial_Modbus/RX_Modbus.txt'                        # Datos leidos del Nfc
+TX_MODBUS                 = FIRM + COMMA + 'Serial_Modbus/TX_Modbus.txt'                        # Datos leidos del Nfc
+PILA_MODBUS               = FIRM + COMMA + 'Serial_Modbus/PILA_Modbus.txt'                      # Datos leidos del Nfc
+
+ID_MOD_USUARIOS           = FIRM + COMMA + 'Serial_Modbus/ID_MOD_Usuarios.txt'                      # Datos leidos del Nfc
+ID_MOD_RELES               = FIRM + COMMA + 'Serial_Modbus/ID_MOD_Reles.txt'                      # Datos leidos del Nfc

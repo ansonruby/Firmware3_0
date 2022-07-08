@@ -31,4 +31,3 @@
 #   Sen_QR                 : lectura y alistamiento basico del qr
 # 4)  Mejoras de lectura de procesos
 #
-

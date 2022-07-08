@@ -79,40 +79,41 @@ def Get_Rout_server():
 
     # return 'https://solutions.fusepong.com'
     # return 'http://192.168.20.41:3000'
+    # print(opciones[mejor_opcion])
     return opciones[mejor_opcion]
 
 
 def log_in():
-    data = encrypt({"attributes": {'email': "admin_wicho@fusepong.com",
+    data = encrypt({"attributes": {'email': "email@fusepong.com",
                                    'password': "password"}}).decode("utf-8")
     # data = encrypt({"attributes": {'email': "luding@counter.com",
     #                'password': "password"}}).decode("utf-8")
-    try:
-        petition = requests.post(
-            url=cloud_server_domain+"/api/users/sign_in",
-            data={"data": data},
-            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID)})
-        if petition.status_code == 201:
-            with open(LAST_LOG_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
-                dfw.write(data)
-                dfw.close()
-            return [petition.json()['data']['id'], petition.json()['meta']['authentication_token']]
-    except:
-        print("not internet connection")
+    petition = requests.post(
+        url=cloud_server_domain+"/api/users/sign_in",
+        data={"data": data},
+        headers={'X-Device-ID': str(DEVICE_CURRENT_UUID)}, timeout=1)
+    if petition.status_code == 201:
+        last_log_data = []
+        with open(LAST_LOG_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
+            last_log_text = df.read().strip()
+            df.close()
+            last_log_data = last_log_text.split("\n")
+        with open(LAST_LOG_LIST_PATH, 'w', encoding='utf-8', errors='replace') as dfw:
+            last_log_data[0] = data
+            dfw.write("\n".join(last_log_data))
+            dfw.close()
+        return [petition.json()['data']['id'], petition.json()['meta']['authentication_token']]
 
 
 def get_devices():
-    try:
-        petition = requests.get(
-            url=cloud_server_domain+"/api/app/scan_devices/find_ip_devices",
-            params={"id": bookingOffice_id},
-            headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
-        if petition.status_code == 200:
-            return petition.json()["data"]["scanners"]
-        else:
-            return []
-    except:
-        print("not internet connection")
+    petition = requests.get(
+        url=cloud_server_domain+"/api/app/scan_devices/find_ip_devices",
+        params={"id": bookingOffice_id},
+        headers={'X-Device-ID': str(DEVICE_CURRENT_UUID), "Authorization": "Bearer "+login_token})
+    if petition.status_code == 200:
+        return petition.json()["data"]["scanners"]
+    else:
+        return []
 
 
 def get_users():
@@ -214,10 +215,15 @@ def auth_petition(qr, ws):
             continue
         compare_data = compare_qr.split(".")
         if compare_data[0] == "6" and data[0] == "6" and compare_data[2] == data[1]:
-            access_identifier = "11"
             ans = True
+            if len(compare_data) > 3:
+                access_identifier = compare_data[3]
+                qr = compare_qr
+            else:
+                access_identifier = "11"
+                qr = compare_qr+".11"
             break
-        if len(data) == 2 and len(compare_data) == 2 and data[1] == compare_data[0]:
+        elif len(data) == 2 and len(compare_data) == 2 and data[1] == compare_data[0]:
             access_identifier = "1"
             ans = True
             break
@@ -334,16 +340,15 @@ def encrypt(data):
 
 def server_updater():
     while True:
-        desconnection = True
-        if os.path.exists(ACTIVE_CONECTION):
-            with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
-                desconnection = df.read().strip() == "3"
-                df.close()
-        if desconnection:
-            # print("desconected")
-            break
-        if login_token != "":
-            get_users()
+        # desconnection = True
+        # if os.path.exists(ACTIVE_CONECTION):
+        #     with open(ACTIVE_CONECTION, 'r', encoding='utf-8', errors='replace') as df:
+        #         desconnection = df.read().strip() == "3"
+        #         df.close()
+        # if desconnection:
+        #     # print("desconected")
+        #     break
+        get_users()
         time.sleep(SERVER_UPDATE_TIME)
 
 
@@ -448,9 +453,11 @@ def server_http():
     @app.route('/scannersPetition', methods=['GET'])
     def scannersPetition():
         if request.args.get('scannerAccessKey') == datetime.datetime.now().strftime("%mFu%dse%Ypong"):
-            granted_users = get_users()
-            tickets = "\n".join(granted_users)
-            return {"status": 201, "tickets": tickets}, 201
+            qr_list = ""
+            with open(QR_LIST_PATH, 'r', encoding='utf-8', errors='replace') as df:
+                qr_list = df.read().strip()
+                df.close()
+            return {"status": 201, "tickets": qr_list}, 201
         else:
             return {"status": 401, "error": "Invalid terminal"}, 401
 
@@ -556,22 +563,20 @@ if __name__ == "__main__":
 
                     cloud_server_domain = Get_Rout_server()
                     credentials = log_in()
+                    # print(credentials)
                     if credentials:
                         [bookingOffice_id, login_token] = credentials
 
-                    active_devices = []
-                    for device_ip in get_devices():
-                        if device_ip[0] and device_ip[0].strip() != "":
-                            device = {"ip": "ws://"+device_ip[0] +
-                                      ":1234/", "id": device_ip[1], "active": True}
-                            active_devices.append(device)
-                    # #print(active_devices)
-                    Thread(target=server_updater).start()
-                    # get_users()
+                        active_devices = []
+                        for device_ip in get_devices():
+                            if device_ip[0] and device_ip[0].strip() != "":
+                                device = {"ip": "ws://"+device_ip[0] +
+                                          ":1234/", "id": device_ip[1], "active": True}
+                                active_devices.append(device)
+                        # #print(active_devices)
+                        Thread(target=server_updater).start()
 
                     socket_guardian()
-                # else:
-                    # print('Custom Error {}'.format(ips[1]))
         except:
-            print("not internet connection")
+            print("offline model this")
         time.sleep(0.5)
