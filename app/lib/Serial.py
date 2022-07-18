@@ -40,7 +40,7 @@ from Lib_Rout import *  # importar con los mismos nombres
 #                       CONSTANTES
 #-----------------------------------------------------------
 
-SQ_Mensajes = 0     # 0: NO print  1: Print
+SQ_Mensajes = 1    # 0: NO print  1: Print
 
 Puerto_Serial = '/dev/ttyS0'
 port = serial.Serial(Puerto_Serial, baudrate=9600, timeout=1)
@@ -62,10 +62,14 @@ def Tx_datos():
     #-------------------------------
     rele = Get_File(COM_TX_RELE)
     if len(rele)>= 1:
+        #if SQ_Mensajes: print 'TX:' + rele
         rele=rele.rstrip('\n')            # eliminar caracteres extras
         rele=rele.rstrip('\r')
+
         if rele == 'Access granted-E': rele = 'EEEEE'
         else: rele = 'DDDDD'
+        rele = 'EEEEE'
+
         if SQ_Mensajes: print 'TX:' + rele
         port.write(rele)
         Clear_File(COM_TX_RELE)
@@ -164,8 +168,9 @@ def Parte_Fin_QR(x):
     Total = Init_QR + Fin_QR
 
     if Validar_QR(Total) == 1:
-         Decision_Qr(Total)          #QR valido
-         Init_QR = Fin_QR = ''
+        Almacenar_Trama(Total)
+        #Decision_Qr(Total)          #QR valido
+        Init_QR = Fin_QR = ''
 
 
 
@@ -280,11 +285,11 @@ def Almacenar_Trama(x):
 #---------------------------------------------------------------------------------------
 def Procesar_Datos(rcv):
     global SQ_Mensajes
-    #if SQ_Mensajes: print 'Datos RX:' + rcv
+    if SQ_Mensajes: print 'Datos RX:' + rcv
     Lineas = rcv.split('\r')
     for x in Lineas:
         if(len(x)>0):
-            #print 'RX_1:' + x +'Tama:'+ str(len(x))
+            if SQ_Mensajes: print 'RX_1:' + x +'Tama:'+ str(len(x))
             Valido = Validar_Trama(x)
             if      Valido == 1:    Almacenar_Trama(x)#print 'Valido:' + x #print 'QR valido' #Decision_Qr(x)          #QR valido
             elif    Valido == 2:    Parte_Inicial_QR(x) #print 'Inicio QR' #Parte_Inicial_QR(x)     #Inicio QR
@@ -316,8 +321,8 @@ def Datos_Serial():
             rcv = port.read(250)
             T_rcv = len(rcv)
             if T_rcv >= 1:
-                #if SQ_Mensajes: print 'Cuantos:' + str(T_rcv)
-                #print 'RX:' + rcv
+                if SQ_Mensajes: print 'Cuantos:' + str(T_rcv)
+                print 'RX:' + rcv
                 Procesar_Datos(rcv)
 
 

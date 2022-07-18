@@ -50,13 +50,14 @@ ID_MASTER_DEFAULT               = "0001"
 #//---------------------  funciones que son para todos ojo si tienen todo el mismo ID responde al mismo tiempo
 
 ¿xxxx0000XXXX?    //devuelve el  id de los modulos  por la misma linea    // mejorar para enviar datos por rs485
-¿xxxx0001XXXX?    //cambiar el ID del Modulo por lo que se coloque en las XXXX 
+¿xxxx0001XXXX?    //cambiar el ID del Modulo por lo que se coloque en las XXXX
 
 #//---------------------  funciones que son esclusivas del modulo
 
 ¿xxxx00020000?    // ¿123400020000? le responde al maaestro con su id,  funcion 2 y dato 0
 ¿xxxx00030000?    // ¿123400030000? le responde al maaestro OK
 ¿xxxx00040001?    // ¿123400040001? activar rele iz por 1 seg, requiere el ID del moodulo xxxx
+
 
 """
 
